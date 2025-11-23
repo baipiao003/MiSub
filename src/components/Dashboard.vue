@@ -420,7 +420,7 @@ const formattedTotalRemainingTraffic = computed(() => formatBytes(totalRemaining
       <!-- Right Column -->
       <div class="lg:col-span-1 space-y-8">
         <RightPanel :config="config" :profiles="profiles" />
-        <ProfilePanel 
+        <ProfilePanel
           :profiles="profiles"
           @add="handleAddProfile"
           @edit="handleEditProfile"
@@ -471,8 +471,8 @@ const formattedTotalRemainingTraffic = computed(() => formatBytes(totalRemaining
     </template>
   </Modal>
   
-  <SettingsModal 
-    v-model:show="uiStore.isSettingsModalVisible" 
+  <SettingsModal
+    v-model:show="uiStore.isSettingsModalVisible"
     :export-backup="exportBackup"
     :import-backup="importBackup"
   />

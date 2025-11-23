@@ -3,6 +3,7 @@ import { onMounted } from 'vue';
 import { useThemeStore } from './stores/theme';
 import { useSessionStore } from './stores/session';
 import { useToastStore } from './stores/toast';
+import { useUIStore } from './stores/ui';
 import { storeToRefs } from 'pinia';
 
 import Dashboard from './components/Dashboard.vue';
@@ -13,6 +14,7 @@ import Toast from './components/Toast.vue';
 import Footer from './components/Footer.vue';
 import PWAUpdatePrompt from './components/PWAUpdatePrompt.vue';
 import PWADevTools from './components/PWADevTools.vue';
+import ProxySettingsModal from './components/ProxySettingsModal.vue';
 
 const themeStore = useThemeStore();
 const { theme } = storeToRefs(themeStore);
@@ -24,6 +26,9 @@ const { checkSession, login, logout } = sessionStore;
 
 const toastStore = useToastStore();
 const { toast: toastState } = storeToRefs(toastStore);
+
+const uiStore = useUIStore();
+const { isProxySettingsModalVisible } = storeToRefs(uiStore);
 
 onMounted(() => {
   initTheme();
@@ -50,10 +55,14 @@ onMounted(() => {
       <Dashboard v-else-if="sessionState === 'loggedIn' && initialData" :data="initialData" />
       <Login v-else :login="login" />
     </main>
-    
+
     <Toast :show="toastState.id" :message="toastState.message" :type="toastState.type" />
     <PWAUpdatePrompt />
     <PWADevTools />
+    <ProxySettingsModal
+      :show="isProxySettingsModalVisible"
+      @close="uiStore.hideProxySettings"
+    />
     <Footer />
   </div>
 </template>

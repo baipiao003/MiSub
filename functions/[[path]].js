@@ -34,6 +34,7 @@ const OLD_KV_KEY = 'misub_data_v1';
 const KV_KEY_SUBS = 'misub_subscriptions_v1';
 const KV_KEY_PROFILES = 'misub_profiles_v1';
 const KV_KEY_SETTINGS = 'worker_settings_v1';
+const KV_KEY_PROXY_CONFIG = 'misub_proxy_config_v1'; // 新增代理配置键
 const COOKIE_NAME = 'auth_session';
 const SESSION_DURATION = 8 * 60 * 60 * 1000;
 
@@ -1653,6 +1654,14 @@ export async function onRequest(context) {
     // **核心修改：判斷是否為定時觸發**
     if (request.headers.get("cf-cron")) {
         return handleCronTrigger(env);
+    }
+
+    // **代理功能路由处理 - 优先级低于通用API**
+    if (url.pathname.startsWith('/api/proxy/') || url.pathname.startsWith('/proxy/')) {
+        const { createProxyHandler } = await import('./proxy/proxy-handler.js');
+        const proxyHandler = createProxyHandler(env);
+        await proxyHandler.init();
+        return await proxyHandler.handleRequest(request);
     }
 
     if (url.pathname.startsWith('/api/')) {

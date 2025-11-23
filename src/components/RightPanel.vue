@@ -127,8 +127,8 @@ onUnmounted(() => {
 
        <p v-if="!isLinkValid || requiredToken.value.value === 'auto'" class="text-xs text-yellow-600 dark:text-yellow-500 mt-2 list-item-animation" style="--delay-index: 4">
            提示：
-           <span v-if="!isLinkValid">请在 
-             <button @click="uiStore.isSettingsModalVisible = true" class="font-bold underline hover:text-yellow-400">设置</button> 
+           <span v-if="!isLinkValid">请在
+             <button @click="uiStore.isSettingsModalVisible = true" class="font-bold underline hover:text-yellow-400">设置</button>
              中配置一个固定的 {{ requiredToken.name }}。
            </span>
            <span v-else-if="requiredToken.type === 'mytoken' && requiredToken.value === 'auto'">

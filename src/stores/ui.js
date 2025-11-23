@@ -3,6 +3,7 @@ import { ref } from 'vue';
 
 export const useUIStore = defineStore('ui', () => {
   const isSettingsModalVisible = ref(false);
+  const isProxySettingsModalVisible = ref(false);
 
   function show() {
     isSettingsModalVisible.value = true;
@@ -12,5 +13,20 @@ export const useUIStore = defineStore('ui', () => {
     isSettingsModalVisible.value = false;
   }
 
-  return { isSettingsModalVisible, show, hide };
+  function showProxySettings() {
+    isProxySettingsModalVisible.value = true;
+  }
+
+  function hideProxySettings() {
+    isProxySettingsModalVisible.value = false;
+  }
+
+  return {
+    isSettingsModalVisible,
+    isProxySettingsModalVisible,
+    show,
+    hide,
+    showProxySettings,
+    hideProxySettings
+  };
 });
