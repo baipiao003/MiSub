@@ -1,3 +1,5 @@
+CLAUDE.md
+wrangler.toml
 # Logs
 logs
 *.log
@@ -14,6 +16,7 @@ dist-ssr
 # Dependencies
 /node_modules/
 .wrangler/
+.dev.vars
 # IDEs and editors
 /.idea
 .project
