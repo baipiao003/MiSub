@@ -260,6 +260,15 @@ export class StorageFactory {
             return STORAGE_TYPES.KV;
         }
     }
+
+    /**
+     * 检查是否配置了双重存储
+     * @param {Object} env - Cloudflare环境对象
+     * @returns {boolean} 是否配置了双重存储
+     */
+    static hasDualStorage(env) {
+        return !!(env.MISUB_KV && env.MISUB_DB);
+    }
 }
 
 /**

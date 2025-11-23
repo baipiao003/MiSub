@@ -1,18 +1,19 @@
 <script setup>
-import { onMounted } from 'vue';
+import { defineAsyncComponent, onMounted } from 'vue';
 import { useThemeStore } from './stores/theme';
 import { useSessionStore } from './stores/session';
 import { useToastStore } from './stores/toast';
 import { storeToRefs } from 'pinia';
 
-import Dashboard from './components/Dashboard.vue';
-import DashboardSkeleton from './components/DashboardSkeleton.vue';
-import Login from './components/Login.vue';
-import Header from './components/Header.vue';
-import Toast from './components/Toast.vue';
-import Footer from './components/Footer.vue';
-import PWAUpdatePrompt from './components/PWAUpdatePrompt.vue';
-import PWADevTools from './components/PWADevTools.vue';
+// 懒加载大型组件以提升性能
+const Dashboard = defineAsyncComponent(() => import('./components/features/Dashboard/Dashboard.vue'));
+const DashboardSkeleton = defineAsyncComponent(() => import('./components/layout/DashboardSkeleton.vue'));
+const Login = defineAsyncComponent(() => import('./components/modals/Login.vue'));
+const Header = defineAsyncComponent(() => import('./components/layout/Header.vue'));
+const Toast = defineAsyncComponent(() => import('./components/ui/Toast.vue'));
+const Footer = defineAsyncComponent(() => import('./components/layout/Footer.vue'));
+const PWAUpdatePrompt = defineAsyncComponent(() => import('./components/features/PWAUpdatePrompt.vue'));
+const PWADevTools = defineAsyncComponent(() => import('./components/features/PWADevTools.vue'));
 
 const themeStore = useThemeStore();
 const { theme } = storeToRefs(themeStore);
@@ -26,6 +27,11 @@ const toastStore = useToastStore();
 const { toast: toastState } = storeToRefs(toastStore);
 
 onMounted(() => {
+  // 简单的性能监控
+  const loadTime = performance.now();
+  console.log(`MiSub App loaded in ${loadTime.toFixed(2)}ms`);
+
+  // 初始化主题和会话
   initTheme();
   checkSession();
 });
