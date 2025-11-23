@@ -14,7 +14,6 @@ dist-ssr
 # Dependencies
 /node_modules/
 .wrangler/
-.dev.vars
 # IDEs and editors
 /.idea
 .project
@@ -24,6 +23,5 @@ dist-ssr
 .settings/
 *.sublime-workspace
 .vscode
-CLAUDE.md
 # Misc
 .DS_Store

@@ -6,7 +6,7 @@ const props = defineProps({
   profiles: Array,
 });
 
-const emit = defineEmits(['add', 'edit', 'delete', 'deleteAll', 'toggle', 'copyLink', 'preview']);
+const emit = defineEmits(['add', 'edit', 'delete', 'deleteAll', 'toggle', 'copyLink']);
 
 const showProfilesMoreMenu = ref(false);
 const profilesMoreMenuRef = ref(null);
@@ -16,7 +16,6 @@ const handleEdit = (profileId) => emit('edit', profileId);
 const handleDelete = (profileId) => emit('delete', profileId);
 const handleToggle = (event) => emit('toggle', event);
 const handleCopyLink = (profileId) => emit('copyLink', profileId);
-const handlePreview = (profileId) => emit('preview', profileId);
 const handleAdd = () => emit('add');
 const handleDeleteAll = () => {
   emit('deleteAll');
@@ -98,7 +97,6 @@ onUnmounted(() => {
         @delete="handleDelete(profile.id)"
         @change="handleToggle($event)"
         @copy-link="handleCopyLink(profile.id)"
-        @preview="handlePreview(profile.id)"
       />
     </div>
     <div v-else class="text-center py-12 text-gray-500 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-xl">

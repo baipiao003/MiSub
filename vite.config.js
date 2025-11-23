@@ -1,7 +1,6 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { VitePWA } from 'vite-plugin-pwa'
-import { resolve } from 'path'
 
 export default defineConfig({
   plugins: [
@@ -86,16 +85,12 @@ export default defineConfig({
         ]
       },
       devOptions: {
-        enabled: false, // 在开发环境中禁用PWA，避免workbox日志
+        enabled: true,
         type: 'module'
       }
     })
   ],
-  resolve: {
-    alias: {
-      '@': resolve(__dirname, 'src')
-    }
-  },
+  // 我们移除了所有 alias 配置
   server: {
     proxy: {
       '/api': {
@@ -103,10 +98,6 @@ export default defineConfig({
         changeOrigin: true,
       },
       '/sub': {
-        target: 'http://127.0.0.1:8787',
-        changeOrigin: true,
-      },
-      '/proxy': {
         target: 'http://127.0.0.1:8787',
         changeOrigin: true,
       }
