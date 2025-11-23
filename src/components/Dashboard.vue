@@ -21,6 +21,7 @@ const SettingsModal = defineAsyncComponent(() => import('./SettingsModal.vue'));
 const BulkImportModal = defineAsyncComponent(() => import('./BulkImportModal.vue'));
 const ProfileModal = defineAsyncComponent(() => import('./ProfileModal.vue'));
 const SubscriptionImportModal = defineAsyncComponent(() => import('./SubscriptionImportModal.vue'));
+const NodePreviewModal = defineAsyncComponent(() => import('./NodePreviewModal.vue'));
 
 // --- 基礎 Props 和狀態 ---
 const props = defineProps({ data: Object });
@@ -71,6 +72,14 @@ const showBulkImportModal = ref(false);
 const showDeleteSubsModal = ref(false);
 const showDeleteNodesModal = ref(false);
 const showSubscriptionImportModal = ref(false);
+
+// 节点预览相关状态
+const showNodePreviewModal = ref(false);
+const previewSubscriptionId = ref(null);
+const previewProfileId = ref(null);
+const previewSubscriptionName = ref('');
+const previewSubscriptionUrl = ref('');
+const previewProfileName = ref('');
 // --- 初始化與生命週期 ---
 const initializeState = () => {
   isLoading.value = true;
@@ -183,6 +192,31 @@ const handleAutoSortNodes = () => {
 const handleDeduplicateNodes = () => {
     deduplicateNodes();
     showToast('已完成去重，请手动保存', 'success');
+};
+
+// 节点预览处理函数
+const handlePreviewSubscription = (subscriptionId) => {
+  const subscription = subscriptions.value.find(s => s.id === subscriptionId);
+  if (subscription) {
+    previewSubscriptionId.value = subscriptionId;
+    previewSubscriptionName.value = subscription.name || '未命名订阅';
+    previewSubscriptionUrl.value = subscription.url;
+    previewProfileId.value = null;
+    previewProfileName.value = '';
+    showNodePreviewModal.value = true;
+  }
+};
+
+const handlePreviewProfile = (profileId) => {
+  const profile = profiles.value.find(p => p.id === profileId || p.customId === profileId);
+  if (profile) {
+    previewProfileId.value = profileId;
+    previewProfileName.value = profile.name;
+    previewSubscriptionId.value = null;
+    previewSubscriptionName.value = '';
+    previewSubscriptionUrl.value = '';
+    showNodePreviewModal.value = true;
+  }
 };
 
 // --- Backup & Restore ---
@@ -391,6 +425,7 @@ const formattedTotalRemainingTraffic = computed(() => formatBytes(totalRemaining
           @toggle-sort="isSortingSubs = !isSortingSubs"
           @mark-dirty="markDirty"
           @delete-all="showDeleteSubsModal = true"
+          @preview="handlePreviewSubscription"
         />
 
         <!-- Manual Node Panel -->
@@ -428,6 +463,7 @@ const formattedTotalRemainingTraffic = computed(() => formatBytes(totalRemaining
           @deleteAll="showDeleteProfilesModal = true"
           @toggle="handleProfileToggle"
           @copyLink="copyProfileLink"
+          @preview="handlePreviewProfile"
         />
       </div>
     </div>
@@ -477,6 +513,17 @@ const formattedTotalRemainingTraffic = computed(() => formatBytes(totalRemaining
     :import-backup="importBackup"
   />
   <SubscriptionImportModal :show="showSubscriptionImportModal" @update:show="showSubscriptionImportModal = $event" :add-nodes-from-bulk="addNodesFromBulk" />
+
+  <!-- 节点预览模态窗口 -->
+  <NodePreviewModal
+    :show="showNodePreviewModal"
+    :subscription-id="previewSubscriptionId"
+    :subscription-name="previewSubscriptionName"
+    :subscription-url="previewSubscriptionUrl"
+    :profile-id="previewProfileId"
+    :profile-name="previewProfileName"
+    @update:show="showNodePreviewModal = $event"
+  />
 </template>
 
 <style scoped>

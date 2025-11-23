@@ -915,6 +915,206 @@ async function handleApiRequest(request, env) {
             }
         }
 
+        case '/subscription_nodes': {
+            if (request.method !== 'POST') return new Response('Method Not Allowed', { status: 405 });
+
+            try {
+                const {
+                    url: subscriptionUrl,
+                    subscriptionId,
+                    profileId,
+                    userAgent = 'MiSub-Node-Preview/1.0'
+                } = await request.json();
+
+                // 支持两种模式：单订阅预览和订阅组预览
+                if (!subscriptionUrl && !subscriptionId && !profileId) {
+                    return new Response(JSON.stringify({ error: '请提供订阅URL、订阅ID或订阅组ID' }), { status: 400 });
+                }
+
+                const storageAdapter = await getStorageAdapter(env);
+                let targetUrls = [];
+                let subscriptionNames = [];
+
+                if (profileId) {
+                    // 订阅组模式：获取订阅组中的所有订阅
+                    const allProfiles = await storageAdapter.get(KV_KEY_PROFILES) || [];
+                    const allSubscriptions = await storageAdapter.get(KV_KEY_SUBS) || [];
+                    const profile = allProfiles.find(p => (p.customId && p.customId === profileId) || p.id === profileId);
+
+                    if (!profile || !profile.enabled) {
+                        return new Response(JSON.stringify({ error: '订阅组不存在或已禁用' }), { status: 404 });
+                    }
+
+                    const profileSubIds = new Set(profile.subscriptions);
+                    const targetSubscriptions = allSubscriptions.filter(sub =>
+                        profileSubIds.has(sub.id) && sub.enabled && sub.url.startsWith('http')
+                    );
+
+                    targetUrls = targetSubscriptions.map(sub => sub.url);
+                    subscriptionNames = targetSubscriptions.map(sub => sub.name);
+                } else if (subscriptionId) {
+                    // 单订阅模式：通过ID获取订阅
+                    const allSubscriptions = await storageAdapter.get(KV_KEY_SUBS) || [];
+                    const subscription = allSubscriptions.find(sub => sub.id === subscriptionId);
+
+                    if (!subscription || !subscription.enabled) {
+                        return new Response(JSON.stringify({ error: '订阅不存在或已禁用' }), { status: 404 });
+                    }
+
+                    targetUrls = [subscription.url];
+                    subscriptionNames = [subscription.name];
+                } else {
+                    // 直接URL模式
+                    targetUrls = [subscriptionUrl];
+                    subscriptionNames = ['预览订阅'];
+                }
+
+                // 并行获取所有订阅的节点
+                const nodePromises = targetUrls.map(async (url, index) => {
+                    const result = {
+                        subscriptionName: subscriptionNames[index],
+                        url: url,
+                        success: false,
+                        nodes: [],
+                        error: null
+                    };
+
+                    try {
+                        const response = await fetch(new Request(url, {
+                            headers: { 'User-Agent': userAgent },
+                            redirect: "follow",
+                            cf: { insecureSkipVerify: true }
+                        }));
+
+                        if (!response.ok) {
+                            result.error = `HTTP ${response.status}: ${response.statusText}`;
+                            return result;
+                        }
+
+                        let text = await response.text();
+
+                        // Base64解码
+                        try {
+                            const cleanedText = text.replace(/\s/g, '');
+                            if (isValidBase64(cleanedText)) {
+                                const binaryString = atob(cleanedText);
+                                const bytes = new Uint8Array(binaryString.length);
+                                for (let i = 0; i < binaryString.length; i++) {
+                                    bytes[i] = binaryString.charCodeAt(i);
+                                }
+                                text = new TextDecoder('utf-8').decode(bytes);
+                            }
+                        } catch (e) {
+                            // Base64解码失败，使用原始内容
+                        }
+
+                        // 提取所有有效节点
+                        const allNodes = text.replace(/\r\n/g, '\n').split('\n')
+                            .map(line => line.trim())
+                            .filter(line => /^(ss|ssr|vmess|vless|trojan|hysteria2?|hy|hy2|tuic|anytls|socks5):\/\//.test(line));
+
+                        // 解析节点信息
+                        const parsedNodes = allNodes.map(nodeUrl => {
+                            const protocolMatch = nodeUrl.match(/^(.*?):\/\//);
+                            const protocol = protocolMatch ? protocolMatch[1].toLowerCase() : 'unknown';
+
+                            let nodeName = '';
+                            let region = '';
+
+                            // 提取节点名称
+                            const hashIndex = nodeUrl.lastIndexOf('#');
+                            if (hashIndex !== -1) {
+                                try {
+                                    nodeName = decodeURIComponent(nodeUrl.substring(hashIndex + 1));
+                                } catch (e) {
+                                    nodeName = nodeUrl.substring(hashIndex + 1);
+                                }
+                            }
+
+                            // 提取地区信息（从节点名称中识别）
+                            const regionKeywords = {
+                                '香港': ['HK', '香港', 'Hong Kong', 'HongKong'],
+                                '台湾': ['TW', '台湾', 'Taiwan', 'Taipei'],
+                                '新加坡': ['SG', '新加坡', 'Singapore'],
+                                '日本': ['JP', '日本', 'Japan', 'Tokyo', 'Osaka'],
+                                '美国': ['US', '美国', 'USA', 'United States', 'America'],
+                                '韩国': ['KR', '韩国', 'Korea', 'Seoul'],
+                                '英国': ['UK', '英国', 'Britain', 'London'],
+                                '德国': ['DE', '德国', 'Germany', 'Frankfurt'],
+                                '法国': ['FR', '法国', 'France', 'Paris'],
+                                '加拿大': ['CA', '加拿大', 'Canada'],
+                                '澳大利亚': ['AU', '澳大利亚', 'Australia'],
+                                '荷兰': ['NL', '荷兰', 'Netherlands', 'Amsterdam'],
+                                '俄罗斯': ['RU', '俄罗斯', 'Russia', 'Moscow'],
+                                '印度': ['IN', '印度', 'India'],
+                                '土耳其': ['TR', '土耳其', 'Turkey', 'Istanbul'],
+                                '马来西亚': ['MY', '马来西亚', 'Malaysia'],
+                                '泰国': ['TH', '泰国', 'Thailand', 'Bangkok'],
+                                '越南': ['VN', '越南', 'Vietnam'],
+                                '菲律宾': ['PH', '菲律宾', 'Philippines'],
+                                '印尼': ['ID', '印尼', 'Indonesia']
+                            };
+
+                            for (const [regionName, keywords] of Object.entries(regionKeywords)) {
+                                if (keywords.some(keyword => nodeName.toLowerCase().includes(keyword.toLowerCase()))) {
+                                    region = regionName;
+                                    break;
+                                }
+                            }
+
+                            return {
+                                name: nodeName || '未命名节点',
+                                url: nodeUrl,
+                                protocol: protocol,
+                                region: region || '其他',
+                                subscriptionName: result.subscriptionName
+                            };
+                        });
+
+                        result.success = true;
+                        result.nodes = parsedNodes;
+
+                    } catch (e) {
+                        result.error = e.message;
+                    }
+
+                    return result;
+                });
+
+                const results = await Promise.all(nodePromises);
+
+                // 合并所有节点
+                const allNodes = [];
+                results.forEach(result => {
+                    if (result.success) {
+                        allNodes.push(...result.nodes);
+                    }
+                });
+
+                // 统计协议类型和地区
+                const protocolStats = {};
+                const regionStats = {};
+                allNodes.forEach(node => {
+                    protocolStats[node.protocol] = (protocolStats[node.protocol] || 0) + 1;
+                    regionStats[node.region] = (regionStats[node.region] || 0) + 1;
+                });
+
+                return new Response(JSON.stringify({
+                    success: true,
+                    subscriptions: results,
+                    nodes: allNodes,
+                    totalCount: allNodes.length,
+                    stats: {
+                        protocols: protocolStats,
+                        regions: regionStats
+                    }
+                }), { headers: { 'Content-Type': 'application/json' } });
+
+            } catch (e) {
+                return new Response(JSON.stringify({ error: `获取节点列表失败: ${e.message}` }), { status: 500 });
+            }
+        }
+
         case '/debug_subscription': {
             if (request.method !== 'POST') return new Response('Method Not Allowed', { status: 405 });
             
