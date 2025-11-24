@@ -131,7 +131,9 @@ export default defineConfig({
       },
       devOptions: {
         enabled: true,
-        type: 'module'
+        type: 'module',
+        // 禁用开发环境的Workbox调试信息
+        navigateFallbackAllowlist: [/^\/$/],
       }
     })
   ],

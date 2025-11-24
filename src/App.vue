@@ -27,9 +27,11 @@ const toastStore = useToastStore();
 const { toast: toastState } = storeToRefs(toastStore);
 
 onMounted(() => {
-  // 简单的性能监控
+  // 简单的性能监控（仅在开发模式显示）
   const loadTime = performance.now();
-  console.log(`MiSub App loaded in ${loadTime.toFixed(2)}ms`);
+  if (import.meta.env.DEV) {
+    console.log(`MiSub App loaded in ${loadTime.toFixed(2)}ms`);
+  }
 
   // 初始化主题和会话
   initTheme();
