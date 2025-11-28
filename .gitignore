@@ -79,3 +79,5 @@ temp/
 
 # Claude Code
 .claude/
+
+DOCKER_GUIDE.md
