@@ -3,31 +3,8 @@
  * @author MiSub Team
  */
 
-/**
- * 地区关键词映射
- */
-export const REGION_KEYWORDS = {
-    '香港': ['HK', '香港', 'Hong Kong', 'HongKong'],
-    '台湾': ['TW', '台湾', 'Taiwan', 'Taipei'],
-    '新加坡': ['SG', '新加坡', 'Singapore'],
-    '日本': ['JP', '日本', 'Japan', 'Tokyo', 'Osaka'],
-    '美国': ['US', '美国', 'USA', 'United States', 'America'],
-    '韩国': ['KR', '韩国', 'Korea', 'Seoul'],
-    '英国': ['UK', '英国', 'Britain', 'London'],
-    '德国': ['DE', '德国', 'Germany', 'Frankfurt'],
-    '法国': ['FR', '法国', 'France', 'Paris'],
-    '加拿大': ['CA', '加拿大', 'Canada'],
-    '澳大利亚': ['AU', '澳大利亚', 'Australia'],
-    '荷兰': ['NL', '荷兰', 'Netherlands', 'Amsterdam'],
-    '俄罗斯': ['RU', '俄罗斯', 'Russia', 'Moscow'],
-    '印度': ['IN', '印度', 'India'],
-    '土耳其': ['TR', '土耳其', 'Turkey', 'Istanbul'],
-    '马来西亚': ['MY', '马来西亚', 'Malaysia'],
-    '泰国': ['TH', '泰国', 'Thailand', 'Bangkok'],
-    '越南': ['VN', '越南', 'Vietnam'],
-    '菲律宾': ['PH', '菲律宾', 'Philippines'],
-    '印尼': ['ID', '印尼', 'Indonesia']
-};
+// [修复] 使用正确的相对路径引用 modules/utils 下的 geo-utils
+import { extractNodeRegion, getRegionEmoji } from '../modules/utils/geo-utils.js';
 
 /**
  * 节点协议正则表达式
@@ -36,9 +13,6 @@ export const NODE_PROTOCOL_REGEX = /^(ss|ssr|vmess|vless|trojan|hysteria2?|hy|hy
 
 /**
  * 为节点名称添加前缀
- * @param {string} link - 节点链接
- * @param {string} prefix - 前缀文本
- * @returns {string} - 添加前缀后的链接
  */
 export function prependNodeName(link, prefix) {
     if (!prefix) return link;
@@ -80,85 +54,78 @@ export function prependNodeName(link, prefix) {
 }
 
 /**
- * 从节点URL提取地区信息
- * @param {string} nodeName - 节点名称
- * @returns {string} - 地区名称
+ * [兼容导出] 从节点URL提取地区信息
  */
 export function extractRegionFromNodeName(nodeName) {
-    for (const [regionName, keywords] of Object.entries(REGION_KEYWORDS)) {
-        if (keywords.some(keyword => nodeName.toLowerCase().includes(keyword.toLowerCase()))) {
-            return regionName;
-        }
-    }
-    return '其他';
+    return extractNodeRegion(nodeName);
 }
 
 /**
- * 从节点URL提取协议类型
- * @param {string} nodeUrl - 节点URL
- * @returns {string} - 协议类型
+ * 为节点链接添加国旗 Emoji
  */
-export function extractProtocolFromNodeUrl(nodeUrl) {
-    const protocolMatch = nodeUrl.match(/^(.*?):\/\//);
-    return protocolMatch ? protocolMatch[1].toLowerCase() : 'unknown';
-}
+export function addFlagEmoji(link) {
+    if (!link) return link;
 
-/**
- * 从节点URL提取节点名称
- * @param {string} nodeUrl - 节点URL
- * @returns {string} - 节点名称
- */
-export function extractNodeNameFromUrl(nodeUrl) {
-    const hashIndex = nodeUrl.lastIndexOf('#');
-    if (hashIndex !== -1) {
+    const appendEmoji = (name) => {
+        const region = extractNodeRegion(name);
+        const emoji = getRegionEmoji(region);
+        if (!emoji) return name;
+        if (name.includes(emoji)) return name;
+        return `${emoji} ${name}`;
+    };
+
+    if (link.startsWith('vmess://')) {
         try {
-            return decodeURIComponent(nodeUrl.substring(hashIndex + 1));
-        } catch (e) {
-            return nodeUrl.substring(hashIndex + 1);
-        }
-    }
-    return '未命名节点';
-}
-
-/**
- * 修复手动SS节点中的URL编码问题
- * @param {string} nodeUrl - 节点URL
- * @returns {string} - 修复后的URL
- */
-export function fixSSEncoding(nodeUrl) {
-    if (!nodeUrl.startsWith('ss://')) {
-        return nodeUrl;
-    }
-
-    try {
-        const hashIndex = nodeUrl.indexOf('#');
-        let baseLink = hashIndex !== -1 ? nodeUrl.substring(0, hashIndex) : nodeUrl;
-        let fragment = hashIndex !== -1 ? nodeUrl.substring(hashIndex) : '';
-
-        // 检查base64部分是否包含URL编码字符
-        const protocolEnd = baseLink.indexOf('://');
-        const atIndex = baseLink.indexOf('@');
-        if (protocolEnd !== -1 && atIndex !== -1) {
-            const base64Part = baseLink.substring(protocolEnd + 3, atIndex);
-            if (base64Part.includes('%')) {
-                // 解码URL编码的base64部分
-                const decodedBase64 = decodeURIComponent(base64Part);
-                baseLink = 'ss://' + decodedBase64 + baseLink.substring(atIndex);
+            const base64Part = link.substring('vmess://'.length);
+            const binaryString = atob(base64Part);
+            const bytes = new Uint8Array(binaryString.length);
+            for (let i = 0; i < binaryString.length; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
             }
+            const jsonString = new TextDecoder('utf-8').decode(bytes);
+            const nodeConfig = JSON.parse(jsonString);
+            if (nodeConfig.ps) {
+                nodeConfig.ps = appendEmoji(nodeConfig.ps);
+                const newJsonString = JSON.stringify(nodeConfig);
+                const newBase64Part = btoa(unescape(encodeURIComponent(newJsonString)));
+                return 'vmess://' + newBase64Part;
+            }
+            return link;
+        } catch (e) {
+            return link;
         }
-        return baseLink + fragment;
-    } catch (e) {
-        // 如果处理失败，返回原始链接
-        return nodeUrl;
+    } else {
+        const hashIndex = link.lastIndexOf('#');
+        if (hashIndex === -1) return link;
+        try {
+            const originalName = decodeURIComponent(link.substring(hashIndex + 1));
+            const newName = appendEmoji(originalName);
+            return link.substring(0, hashIndex + 1) + encodeURIComponent(newName);
+        } catch (e) {
+            return link;
+        }
     }
 }
 
 /**
- * 修复节点URL中的编码问题（支持多种协议）
- * @param {string} nodeUrl - 节点URL
- * @returns {string} - 修复后的URL
+ * [核心修复] 修复节点URL中的编码问题（包含 Hysteria2 密码解码）
  */
 export function fixNodeUrlEncoding(nodeUrl) {
+    // 1. 针对 Hysteria2 的 obfs-password 进行解码
+    if (nodeUrl.startsWith('hysteria2://')) {
+        // 查找 obfs-password= 及其后的值，并进行 URL 解码
+        // 例如：obfs-password=Aq112211%21 -> obfs-password=Aq112211!
+        nodeUrl = nodeUrl.replace(/([?&]obfs-password=)([^&]+)/g, (match, prefix, value) => {
+            try {
+                return prefix + decodeURIComponent(value);
+            } catch (e) {
+                return match;
+            }
+        });
+        return nodeUrl;
+    }
+
+    // 2. 其他协议的 Base64 修复逻辑
     if (!nodeUrl.startsWith('ss://') && !nodeUrl.startsWith('vless://') && !nodeUrl.startsWith('trojan://')) {
         return nodeUrl;
     }
@@ -168,13 +135,11 @@ export function fixNodeUrlEncoding(nodeUrl) {
         let baseLink = hashIndex !== -1 ? nodeUrl.substring(0, hashIndex) : nodeUrl;
         let fragment = hashIndex !== -1 ? nodeUrl.substring(hashIndex) : '';
 
-        // 检查base64部分是否包含URL编码字符
         const protocolEnd = baseLink.indexOf('://');
         const atIndex = baseLink.indexOf('@');
         if (protocolEnd !== -1 && atIndex !== -1) {
             const base64Part = baseLink.substring(protocolEnd + 3, atIndex);
             if (base64Part.includes('%')) {
-                // 解码URL编码的base64部分
                 const decodedBase64 = decodeURIComponent(base64Part);
                 const protocol = baseLink.substring(0, protocolEnd);
                 baseLink = protocol + '://' + decodedBase64 + baseLink.substring(atIndex);
@@ -182,7 +147,6 @@ export function fixNodeUrlEncoding(nodeUrl) {
         }
         return baseLink + fragment;
     } catch (e) {
-        // 如果处理失败，返回原始链接
         return nodeUrl;
     }
 }

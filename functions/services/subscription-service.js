@@ -174,6 +174,15 @@ function fixSSEncoding(nodeUrl) {
  * @returns {string} - 修复后的URL
  */
 function fixNodeUrlEncoding(nodeUrl) {
+    if (nodeUrl.startsWith('hysteria2://')) {
+        return nodeUrl.replace(/([?&]obfs-password=)([^&]+)/g, (match, prefix, value) => {
+            try {
+                return prefix + decodeURIComponent(value);
+            } catch (e) {
+                return match;
+            }
+        });
+    }
     if (!nodeUrl.startsWith('ss://') && !nodeUrl.startsWith('vless://') && !nodeUrl.startsWith('trojan://')) {
         return nodeUrl;
     }
@@ -183,13 +192,11 @@ function fixNodeUrlEncoding(nodeUrl) {
         let baseLink = hashIndex !== -1 ? nodeUrl.substring(0, hashIndex) : nodeUrl;
         let fragment = hashIndex !== -1 ? nodeUrl.substring(hashIndex) : '';
 
-        // 检查base64部分是否包含URL编码字符
         const protocolEnd = baseLink.indexOf('://');
         const atIndex = baseLink.indexOf('@');
         if (protocolEnd !== -1 && atIndex !== -1) {
             const base64Part = baseLink.substring(protocolEnd + 3, atIndex);
             if (base64Part.includes('%')) {
-                // 解码URL编码的base64部分
                 const decodedBase64 = decodeURIComponent(base64Part);
                 const protocol = baseLink.substring(0, protocolEnd);
                 baseLink = protocol + '://' + decodedBase64 + baseLink.substring(atIndex);
@@ -197,7 +204,6 @@ function fixNodeUrlEncoding(nodeUrl) {
         }
         return baseLink + fragment;
     } catch (e) {
-        // 如果处理失败，返回原始链接
         return nodeUrl;
     }
 }

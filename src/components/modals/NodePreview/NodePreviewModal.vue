@@ -127,7 +127,7 @@ const loadNodes = async () => {
 
   try {
     const requestData = {
-      userAgent: 'MiSub-Node-Preview/1.0'
+      userAgent: 'v2rayN/7.23'
     };
 
     if (props.profileId) {
