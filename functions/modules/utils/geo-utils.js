@@ -54,6 +54,9 @@ export const REGION_KEYWORDS = {
     '奥地利': ['AT', '奥地利', 'Austria', 'Vienna', 'Salzburg']
 };
 
+/**
+ * [新增] 地区 Emoji 映射表
+ */
 export const REGION_EMOJI = {
     '香港': '🇭🇰',
     '台湾': '🇹🇼',
@@ -139,6 +142,15 @@ export function getSupportedRegions() {
  */
 export function getRegionKeywords(region) {
     return REGION_KEYWORDS[region] || [];
+}
+
+/**
+ * [新增] 获取地区 Emoji
+ * @param {string} region - 地区名称
+ * @returns {string} 对应的 Emoji，如果未找到则返回空字符串
+ */
+export function getRegionEmoji(region) {
+    return REGION_EMOJI[region] || '';
 }
 
 /**
@@ -236,8 +248,4 @@ export function calculateRegionStats(nodes) {
     }
 
     return stats;
-}
-
-export function getRegionEmoji(region) {
-    return REGION_EMOJI[region] || '';
 }
