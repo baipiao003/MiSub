@@ -20,6 +20,7 @@ export const defaultSettings = {
         enableManualNodes: true,
         enableSubscriptions: true,
         manualNodePrefix: '手动节点',
+        enableNodeEmoji: true
     },
     NotifyThresholdDays: 3,
     NotifyThresholdPercent: 90,
@@ -35,6 +36,10 @@ export async function generateCombinedNodeList(context, config, userAgent, misub
         config.prefixConfig?.manualNodePrefix ??
         '手动节点';
 
+    const shouldAddEmoji = profilePrefixSettings?.enableNodeEmoji ?? 
+        config.prefixConfig?.enableNodeEmoji ?? 
+        true;
+
     // --- 处理手动节点 ---
     const processedManualNodes = misubs.filter(sub => !sub.url.toLowerCase().startsWith('http')).map(node => {
         if (node.isExpiredNode) {
@@ -42,7 +47,10 @@ export async function generateCombinedNodeList(context, config, userAgent, misub
         } else {
             let processedUrl = node.url;
             processedUrl = fixNodeUrlEncoding(processedUrl);
-            processedUrl = addFlagEmoji(processedUrl);
+            if (shouldAddEmoji) {
+                processedUrl = addFlagEmoji(processedUrl);
+            }
+            
             return shouldPrependManualNodes ? prependNodeName(processedUrl, manualNodePrefix) : processedUrl;
         }
     }).join('\n');
@@ -85,7 +93,7 @@ export async function generateCombinedNodeList(context, config, userAgent, misub
                 })
                 .map(line => {
                     // 2. 添加国旗 Emoji
-                    return addFlagEmoji(line);
+                    return shouldAddEmoji ? addFlagEmoji(line) : line;
                 });
 
             // 过滤规则处理

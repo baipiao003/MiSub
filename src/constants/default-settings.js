@@ -14,6 +14,7 @@ export const DEFAULT_SETTINGS = {
         enableManualNodes: true,
         enableSubscriptions: true,
         manualNodePrefix: '手动节点',
+        enableNodeEmoji: true // [新增] 默认开启国旗 Emoji
     },
     NotifyThresholdDays: 3,
     NotifyThresholdPercent: 90,

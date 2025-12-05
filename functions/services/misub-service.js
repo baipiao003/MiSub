@@ -26,6 +26,7 @@ const defaultSettings = {
         enableManualNodes: true,
         enableSubscriptions: true,
         manualNodePrefix: '手动节点',
+        enableNodeEmoji: true
     }
 };
 
@@ -56,6 +57,10 @@ function migrateConfigSettings(config) {
     }
     if (!migratedConfig.prefixConfig.hasOwnProperty('manualNodePrefix')) {
         migratedConfig.prefixConfig.manualNodePrefix = '手动节点';
+    }
+
+    if (!migratedConfig.prefixConfig.hasOwnProperty('enableNodeEmoji')) {
+        migratedConfig.prefixConfig.enableNodeEmoji = true;
     }
 
     return migratedConfig;

@@ -25,7 +25,8 @@ const defaultSettings = {
     prefixConfig: {
         enableManualNodes: true,
         enableSubscriptions: true,
-        manualNodePrefix: '手动节点'
+        manualNodePrefix: '手动节点',
+        enableNodeEmoji: true
     },
     NotifyThresholdDays: 3,
     NotifyThresholdPercent: 90,

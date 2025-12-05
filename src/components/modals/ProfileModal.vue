@@ -152,7 +152,8 @@ watch(() => props.profile, (newProfile) => {
       prefixSettings: {
         enableManualNodes: null,
         enableSubscriptions: null,
-        manualNodePrefix: ''
+        manualNodePrefix: '',
+        enableNodeEmoji: null // [新增] 初始化为 null (使用全局设置)
       }
     };
   }
@@ -308,6 +309,20 @@ const handleDeselectAll = (listName, sourceArray) => {
                   </div>
                   <select 
                     v-model="localProfile.prefixSettings.enableSubscriptions" 
+                    class="text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded px-2 py-1 focus:outline-hidden focus:ring-indigo-500 focus:border-indigo-500 dark:text-white"
+                  >
+                    <option :value="null">使用全局设置</option>
+                    <option :value="true">启用</option>
+                    <option :value="false">禁用</option>
+                  </select>
+                </div>
+                <div class="flex items-center justify-between pt-2 border-t border-gray-200 dark:border-gray-600 mt-2">
+                  <div>
+                    <p class="text-sm font-medium text-gray-700 dark:text-gray-300">节点国旗 Emoji</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">是否为此订阅组添加国旗图标</p>
+                  </div>
+                  <select
+                    v-model="localProfile.prefixSettings.enableNodeEmoji"
                     class="text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded px-2 py-1 focus:outline-hidden focus:ring-indigo-500 focus:border-indigo-500 dark:text-white"
                   >
                     <option :value="null">使用全局设置</option>
