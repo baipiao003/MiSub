@@ -16,9 +16,10 @@ const prefixToggleOptions = [
 ];
 
 const buildDefaultPrefixSettings = () => ({
-  enableManualNodes: true,
-  enableSubscriptions: true,
-  manualNodePrefix: '手动节点'
+enableManualNodes: true,
+enableSubscriptions: true,
+manualNodePrefix: '手动节点',
+prependGroupName: false
 });
 
 const buildDefaultNodeTransform = () => ({
@@ -58,10 +59,11 @@ const ensureDefaults = () => {
   if (!props.settings.defaultPrefixSettings) {
     props.settings.defaultPrefixSettings = buildDefaultPrefixSettings();
   } else {
-    const prefix = props.settings.defaultPrefixSettings;
-    if (typeof prefix.enableManualNodes !== 'boolean') prefix.enableManualNodes = true;
-    if (typeof prefix.enableSubscriptions !== 'boolean') prefix.enableSubscriptions = true;
-    if (!prefix.manualNodePrefix) prefix.manualNodePrefix = '手动节点';
+const prefix = props.settings.defaultPrefixSettings;
+if (typeof prefix.enableManualNodes !== 'boolean') prefix.enableManualNodes = true;
+if (typeof prefix.enableSubscriptions !== 'boolean') prefix.enableSubscriptions = true;
+if (!prefix.manualNodePrefix) prefix.manualNodePrefix = '手动节点';
+if (typeof prefix.prependGroupName !== 'boolean') prefix.prependGroupName = false;
   }
 
   if (!props.settings.defaultNodeTransform) {
@@ -100,44 +102,61 @@ watch(() => props.settings, ensureDefaults, { immediate: true });
         节点前缀设置
       </h3>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div class="sm:col-span-2">
-          <Input
-            v-model="settings.defaultPrefixSettings.manualNodePrefix"
-            label="手动节点前缀"
-          />
-        </div>
-        <div>
-          <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">手动节点前缀</label>
-          <div class="relative">
-            <select
-              v-model="settings.defaultPrefixSettings.enableManualNodes"
-              class="w-full bg-white/70 dark:bg-black/20 border border-gray-200/80 dark:border-white/10 rounded-xl py-3 px-4 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500/40 focus:outline-none transition-all appearance-none"
-            >
-              <option v-for="option in prefixToggleOptions" :key="String(option.value)" :value="option.value">
-                {{ option.label }}
-              </option>
-            </select>
-            <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-              <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
-            </div>
-          </div>
-        </div>
-        <div>
-          <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">机场订阅前缀</label>
-          <div class="relative">
-            <select
-              v-model="settings.defaultPrefixSettings.enableSubscriptions"
-              class="w-full bg-white/70 dark:bg-black/20 border border-gray-200/80 dark:border-white/10 rounded-xl py-3 px-4 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500/40 focus:outline-none transition-all appearance-none"
-            >
-              <option v-for="option in prefixToggleOptions" :key="String(option.value)" :value="option.value">
-                {{ option.label }}
-              </option>
-            </select>
-            <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-              <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
-            </div>
-          </div>
-        </div>
+<div class="sm:col-span-2">
+<Input
+v-model="settings.defaultPrefixSettings.manualNodePrefix"
+label="手动节点前缀"
+/>
+</div>
+<div>
+<label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">手动节点前缀</label>
+<div class="relative">
+<select
+v-model="settings.defaultPrefixSettings.enableManualNodes"
+class="w-full bg-white/70 dark:bg-gray-800/80 border border-gray-200/80 dark:border-white/10 rounded-xl py-3 px-4 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500/40 focus:outline-none transition-all appearance-none"
+>
+<option v-for="option in prefixToggleOptions" :key="String(option.value)" :value="option.value" class="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
+{{ option.label }}
+</option>
+</select>
+<div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+<svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+</div>
+</div>
+</div>
+<div>
+<label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">机场订阅前缀</label>
+<div class="relative">
+<select
+v-model="settings.defaultPrefixSettings.enableSubscriptions"
+class="w-full bg-white/70 dark:bg-gray-800/80 border border-gray-200/80 dark:border-white/10 rounded-xl py-3 px-4 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500/40 focus:outline-none transition-all appearance-none"
+>
+<option v-for="option in prefixToggleOptions" :key="String(option.value)" :value="option.value" class="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
+{{ option.label }}
+</option>
+</select>
+<div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+<svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+</div>
+</div>
+</div>
+<div>
+<label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">分组名称前缀</label>
+<div class="relative">
+<select
+v-model="settings.defaultPrefixSettings.prependGroupName"
+class="w-full bg-white/70 dark:bg-gray-800/80 border border-gray-200/80 dark:border-white/10 rounded-xl py-3 px-4 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500/40 focus:outline-none transition-all appearance-none"
+>
+<option v-for="option in prefixToggleOptions" :key="String(option.value)" :value="option.value" class="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
+{{ option.label }}
+</option>
+</select>
+<div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+<svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+</div>
+</div>
+<p class="text-xs text-gray-400 mt-1">启用后，手动节点输出时会在名称前添加分组名称。注：开启节点净化管道后失效</p>
+</div>
       </div>
     </div>
 

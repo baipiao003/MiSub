@@ -35,9 +35,15 @@ const uiText = {
   nodeTransformTitle: '\u8282\u70b9\u51c0\u5316\u7ba1\u9053'
 };
 const prefixToggleOptions = [
-  { label: '\u9ed8\u8ba4(\u5168\u5c40)', value: null },
-  { label: '\u542f\u7528', value: true },
-  { label: '\u7981\u7528', value: false }
+{ label: '默认(全局)', value: null },
+{ label: '启用', value: true },
+{ label: '禁用', value: false }
+];
+
+const groupPrefixToggleOptions = [
+{ label: '默认(全局)', value: null },
+{ label: '启用', value: true },
+{ label: '禁用', value: false }
 ];
 
 const createDefaultNodeTransform = () => ({
@@ -206,34 +212,37 @@ watch(() => props.profile, (newProfile) => {
     if (!profileCopy.prefixSettings || typeof profileCopy.prefixSettings !== 'object') {
       profileCopy.prefixSettings = {};
     }
-    profileCopy.prefixSettings.enableManualNodes =
-      profileCopy.prefixSettings.enableManualNodes ?? null;
-    profileCopy.prefixSettings.enableSubscriptions =
-      profileCopy.prefixSettings.enableSubscriptions ?? null;
-    profileCopy.prefixSettings.manualNodePrefix =
-      profileCopy.prefixSettings.manualNodePrefix ?? '';
+profileCopy.prefixSettings.enableManualNodes =
+profileCopy.prefixSettings.enableManualNodes ?? null;
+profileCopy.prefixSettings.enableSubscriptions =
+profileCopy.prefixSettings.enableSubscriptions ?? null;
+profileCopy.prefixSettings.manualNodePrefix =
+profileCopy.prefixSettings.manualNodePrefix ?? '';
+profileCopy.prefixSettings.prependGroupName =
+profileCopy.prefixSettings.prependGroupName ?? null;
     if (Object.prototype.hasOwnProperty.call(profileCopy.prefixSettings, 'enableNodeEmoji')) {
       delete profileCopy.prefixSettings.enableNodeEmoji;
     }
     profileCopy.nodeTransform = profileCopy.nodeTransform ?? null;
     localProfile.value = profileCopy;
   } else {
-    localProfile.value = {
-      name: '',
-      enabled: true,
-      subscriptions: [],
-      manualNodes: [],
-      customId: '',
-      expiresAt: '',
-      isPublic: true, // [新增] 默认为 true
-      description: '', // [新增]
-      prefixSettings: {
-        enableManualNodes: null,
-        enableSubscriptions: null,
-        manualNodePrefix: ''
-      },
-      nodeTransform: null
-    };
+localProfile.value = {
+name: '',
+enabled: true,
+subscriptions: [],
+manualNodes: [],
+customId: '',
+expiresAt: '',
+isPublic: true, // [新增] 默认为 true
+description: '', // [新增]
+prefixSettings: {
+enableManualNodes: null,
+enableSubscriptions: null,
+manualNodePrefix: '',
+prependGroupName: null
+},
+nodeTransform: null
+};
   }
 }, { deep: true, immediate: true });
 
@@ -302,9 +311,10 @@ const updateSelectedIds = (listName, newIds) => {
     </template>
     <template #body>
       <div v-if="localProfile" class="space-y-6">
-        <ProfileForm :local-profile="localProfile" :show-advanced="showAdvanced" :ui-text="uiText"
-          :prefix-toggle-options="prefixToggleOptions" :create-default-node-transform="createDefaultNodeTransform"
-          @toggle-advanced="showAdvanced = !showAdvanced" />
+<ProfileForm :local-profile="localProfile" :show-advanced="showAdvanced" :ui-text="uiText"
+:prefix-toggle-options="prefixToggleOptions" :group-prefix-toggle-options="groupPrefixToggleOptions"
+:create-default-node-transform="createDefaultNodeTransform"
+@toggle-advanced="showAdvanced = !showAdvanced" />
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 

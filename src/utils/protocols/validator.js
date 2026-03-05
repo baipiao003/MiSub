@@ -7,7 +7,7 @@ export function validateGeneratedUrl(url) {
     }
 
     try {
-        const supportedProtocols = ['vmess', 'vless', 'trojan', 'ss', 'ssr', 'hysteria', 'hysteria2', 'hy2', 'tuic', 'snell', 'socks5', 'socks', 'http', 'https'];
+        const supportedProtocols = ['vmess', 'vless', 'trojan', 'ss', 'ssr', 'hysteria', 'hysteria2', 'hy2', 'tuic', 'snell', 'socks5', 'socks', 'http', 'https', 'wireguard'];
 
         // 检查是否包含协议分隔符
         if (!url.includes('://')) {

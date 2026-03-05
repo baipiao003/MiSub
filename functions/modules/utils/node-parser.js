@@ -13,7 +13,7 @@ import { validateSS2022Node, fixSS2022Node } from './ss2022-validator.js';
 /**
  * 支持的节点协议正则表达式
  */
-export const NODE_PROTOCOL_REGEX = /^(ss|ssr|vmess|vless|trojan|hysteria2|hy2|hysteria|tuic|snell|naive\+https?|naive\+quic|socks5|socks|http|anytls):\/\//i;
+export const NODE_PROTOCOL_REGEX = /^(ss|ssr|vmess|vless|trojan|hysteria2|hy2|hysteria|tuic|snell|naive\+https?|naive\+quic|socks5|socks|http|anytls|wireguard):\/\//i;
 
 /**
  * Base64编码辅助函数
@@ -206,24 +206,72 @@ function convertClashProxyToUrl(proxy) {
             return `${scheme}://${auth}${server}:${port}${query}#${encodeURIComponent(name)}`;
         }
 
-        // [新增] 支持 anytls 类型代理
-        if (type === 'anytls') {
-            const password = proxy.password || '';
-            const params = [];
+// [新增] 支持 anytls 类型代理
+if (type === 'anytls') {
+const password = proxy.password || '';
+const params = [];
 
-            if (proxy.sni) params.push(`sni=${encodeURIComponent(proxy.sni)}`);
-            if (proxy.alpn) {
-                const alpn = Array.isArray(proxy.alpn) ? proxy.alpn.join(',') : proxy.alpn;
-                params.push(`alpn=${encodeURIComponent(alpn)}`);
-            }
-            if (proxy['skip-cert-verify']) params.push('insecure=1');
-            if (proxy.padding !== undefined) params.push(`padding=${proxy.padding}`);
+if (proxy.sni) params.push(`sni=${encodeURIComponent(proxy.sni)}`);
+if (proxy.alpn) {
+const alpn = Array.isArray(proxy.alpn) ? proxy.alpn.join(',') : proxy.alpn;
+params.push(`alpn=${encodeURIComponent(alpn)}`);
+}
+if (proxy['skip-cert-verify']) params.push('insecure=1');
+if (proxy.padding !== undefined) params.push(`padding=${proxy.padding}`);
 
-            const query = params.length > 0 ? `?${params.join('&')}` : '';
-            return `anytls://${encodeURIComponent(password)}@${server}:${port}${query}#${encodeURIComponent(name)}`;
-        }
+const query = params.length > 0 ? `?${params.join('&')}` : '';
+return `anytls://${encodeURIComponent(password)}@${server}:${port}${query}#${encodeURIComponent(name)}`;
+}
 
-        return null;
+// [新增] 支持 WireGuard 协议
+if (type === 'wireguard') {
+if (!proxy['private-key'] || !proxy.server || !proxy.port) return null;
+const params = new URLSearchParams();
+
+// 公钥 (必需)
+if (proxy['public-key'] || proxy.publicKey) {
+params.set('publickey', proxy['public-key'] || proxy.publicKey);
+}
+
+// 本地地址
+if (proxy.ip || proxy['local-address']) {
+const addr = Array.isArray(proxy.ip || proxy['local-address']) 
+? (proxy.ip || proxy['local-address']).join(',') 
+: (proxy.ip || proxy['local-address']);
+params.set('address', addr);
+}
+
+// Allowed IPs
+if (proxy['allowed-ips'] || proxy.allowedIPs) {
+const ips = Array.isArray(proxy['allowed-ips'] || proxy.allowedIPs) 
+? (proxy['allowed-ips'] || proxy.allowedIPs).join(',') 
+: (proxy['allowed-ips'] || proxy.allowedIPs);
+params.set('allowedips', ips);
+}
+
+// Reserved (Cloudflare WARP)
+if (proxy.reserved) {
+params.set('reserved', Array.isArray(proxy.reserved) ? proxy.reserved.join(',') : String(proxy.reserved));
+}
+
+// 可选参数
+if (proxy.mtu) params.set('mtu', String(proxy.mtu));
+if (proxy.dns) params.set('dns', Array.isArray(proxy.dns) ? proxy.dns.join(',') : proxy.dns);
+if (proxy['persistent-keepalive']) params.set('keepalive', String(proxy['persistent-keepalive']));
+if (proxy['preshared-key'] || proxy.presharedKey) {
+params.set('presharedkey', proxy['preshared-key'] || proxy.presharedKey);
+}
+
+// IPv6 服务器地址处理
+let serverAddr = proxy.server;
+if (serverAddr.includes(':') && !serverAddr.startsWith('[')) {
+serverAddr = `[${serverAddr}]`;
+}
+
+return `wireguard://${encodeURIComponent(proxy['private-key'])}@${serverAddr}:${proxy.port}?${params.toString()}#${encodeURIComponent(name)}`;
+}
+
+return null;
     } catch (e) {
         console.error('Error converting proxy:', e);
         return null;

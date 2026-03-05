@@ -5,26 +5,30 @@ import NodeTransformSettings from '../../settings/NodeTransformSettings.vue';
 import Input from '../../ui/Input.vue';
 
 const props = defineProps({
-  localProfile: {
-    type: Object,
-    required: true
-  },
-  showAdvanced: {
-    type: Boolean,
-    default: false
-  },
-  uiText: {
-    type: Object,
-    required: true
-  },
-  prefixToggleOptions: {
-    type: Array,
-    default: () => []
-  },
-  createDefaultNodeTransform: {
-    type: Function,
-    required: true
-  }
+localProfile: {
+type: Object,
+required: true
+},
+showAdvanced: {
+type: Boolean,
+default: false
+},
+uiText: {
+type: Object,
+required: true
+},
+prefixToggleOptions: {
+type: Array,
+default: () => []
+},
+groupPrefixToggleOptions: {
+type: Array,
+default: () => []
+},
+createDefaultNodeTransform: {
+type: Function,
+required: true
+}
 });
 
 const emit = defineEmits(['toggle-advanced']);
@@ -179,18 +183,30 @@ const nodeTransformMode = computed({
               </option>
             </select>
           </div>
-          <div>
-            <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">{{ uiText.subscriptionPrefixToggle }}</label>
-            <select
-              v-model="localProfile.prefixSettings.enableSubscriptions"
-              class="w-full px-3 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-xs focus:outline-hidden focus:ring-indigo-500 focus:border-indigo-500 dark:text-white"
-            >
-              <option v-for="option in prefixToggleOptions" :key="String(option.value)" :value="option.value">
-                {{ option.label }}
-              </option>
-            </select>
-          </div>
-        </div>
+<div>
+<label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">{{ uiText.subscriptionPrefixToggle }}</label>
+<select
+v-model="localProfile.prefixSettings.enableSubscriptions"
+class="w-full px-3 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-xs focus:outline-hidden focus:ring-indigo-500 focus:border-indigo-500 dark:text-white"
+>
+<option v-for="option in prefixToggleOptions" :key="String(option.value)" :value="option.value">
+{{ option.label }}
+</option>
+</select>
+</div>
+<div class="sm:col-span-2">
+<label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">分组名称前缀</label>
+<select
+v-model="localProfile.prefixSettings.prependGroupName"
+class="w-full px-3 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-xs focus:outline-hidden focus:ring-indigo-500 focus:border-indigo-500 dark:text-white"
+>
+<option v-for="option in groupPrefixToggleOptions" :key="String(option.value)" :value="option.value">
+{{ option.label }}
+</option>
+</select>
+<p class="text-xs text-gray-400 mt-1">启用后，手动节点输出时会在名称前添加分组名称（如"香港 - 节点名"）</p>
+</div>
+</div>
       </div>
 
       <!-- Node Transform Settings -->

@@ -17,11 +17,12 @@ export const DEFAULT_SETTINGS = {
     enablePublicPage: true,
     storageType: 'kv',
     autoUpdateInterval: 0, // 分钟，0表示禁用自动更新
-    defaultPrefixSettings: {
-        enableManualNodes: true,
-        enableSubscriptions: true,
-        manualNodePrefix: '\u624b\u52a8\u8282\u70b9'
-    },
+defaultPrefixSettings: {
+enableManualNodes: true,
+enableSubscriptions: true,
+manualNodePrefix: '\u624b\u52a8\u8282\u70b9',
+prependGroupName: false
+},
     defaultNodeTransform: {
         enabled: false,
         rename: {
@@ -82,9 +83,10 @@ export const DEFAULT_PROFILE_FORM = {
     subscriptions: [],
     manualNodes: [],
     enabled: true,
-    prefixSettings: {
-        enableManualNodes: true,
-        enableSubscriptions: true,
-        manualNodePrefix: '\u624b\u52a8\u8282\u70b9'
-    }
+prefixSettings: {
+enableManualNodes: true,
+enableSubscriptions: true,
+manualNodePrefix: '\u624b\u52a8\u8282\u70b9',
+prependGroupName: null
+}
 };
