@@ -74,7 +74,7 @@ const submitLogin = async () => {
             type="password"
             placeholder="Access Token"
             :disabled="isLoading"
-            class="w-full bg-transparent border rounded-xl py-3.5 pl-11 pr-4 outline-none transition-all duration-300 disabled:opacity-50"
+            class="w-full bg-transparent border misub-radius-lg py-3.5 pl-11 pr-4 outline-none transition-all duration-300 disabled:opacity-50"
             :class="[
               error 
                 ? 'border-red-500 text-red-500 placeholder-red-300 focus:border-red-500 focus:ring-1 focus:ring-red-500/50' 

@@ -49,7 +49,7 @@ defineExpose({ handleSave });
     <div v-else class="flex flex-col md:flex-row gap-6">
       <!-- 侧边栏导航 -->
       <aside class="md:w-48 flex-shrink-0">
-        <div class="bg-white dark:bg-gray-800 rounded-3xl p-2 h-full border border-gray-100 dark:border-gray-700 elevation-2">
+        <div class="bg-white dark:bg-gray-800 misub-radius-lg p-2 h-full border border-gray-100 dark:border-gray-700 elevation-2">
           <SettingsSidebar v-model:activeTab="activeTab" />
         </div>
       </aside>

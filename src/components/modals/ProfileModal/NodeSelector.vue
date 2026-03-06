@@ -69,7 +69,7 @@ const orderedSelectedNodes = computed({
     </div>
     <!-- Group Filter -->
     <div
-      class="flex items-center gap-2 mb-2 p-1.5 rounded-lg border-b border-gray-100 dark:border-gray-700/50 overflow-x-auto no-scrollbar mask-gradient-r">
+      class="flex items-center gap-2 mb-2 p-1.5 misub-radius-md border-b border-gray-100 dark:border-gray-700/50 overflow-x-auto no-scrollbar mask-gradient-r">
       <button @click="emit('update:groupFilter', null)"
         class="px-2.5 py-1 text-xs font-medium rounded-full transition-all border shrink-0 whitespace-nowrap"
         :class="!activeGroupFilter ? 'bg-indigo-100 text-indigo-700 border-indigo-200 dark:bg-indigo-900 dark:text-indigo-300 dark:border-indigo-700' : 'bg-white text-gray-600 border-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600'">全部</button>
@@ -86,7 +86,7 @@ const orderedSelectedNodes = computed({
 
     <div class="relative mb-2">
       <input type="text" v-model="searchModel" placeholder="搜索节点..."
-        class="w-full pl-9 pr-3 py-1.5 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-xs focus:outline-hidden focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500" />
+        class="w-full pl-9 pr-3 py-1.5 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 misub-radius-md shadow-xs focus:outline-hidden focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500" />
       <svg class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg"
         fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -94,7 +94,7 @@ const orderedSelectedNodes = computed({
       </svg>
     </div>
     <div
-      class="overflow-y-auto space-y-2 p-3 bg-gray-50 dark:bg-gray-900/50 rounded-lg border dark:border-gray-700 h-36 lg:h-64">
+      class="overflow-y-auto space-y-2 p-3 bg-gray-50 dark:bg-gray-900/50 misub-radius-md border dark:border-gray-700 h-36 lg:h-64">
       <div v-for="node in filteredNodes" :key="node.id">
         <label class="flex items-center space-x-3 cursor-pointer">
           <input type="checkbox" :checked="selectedIds.includes(node.id)" @change="emit('toggle-selection', node.id)"
@@ -116,7 +116,7 @@ const orderedSelectedNodes = computed({
         </h5>
       </div>
       <draggable v-model="orderedSelectedNodes" item-key="id" handle=".drag-handle" ghost-class="opacity-40"
-        class="space-y-1 p-2 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg border border-indigo-200 dark:border-indigo-800 h-32 lg:h-48 overflow-y-auto">
+        class="space-y-1 p-2 bg-indigo-50 dark:bg-indigo-900/20 misub-radius-md border border-indigo-200 dark:border-indigo-800 h-32 lg:h-48 overflow-y-auto">
         <template #item="{ element, index }">
           <div
             class="flex items-center gap-2 px-2 py-1.5 bg-white dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-700 shadow-xs">
@@ -142,7 +142,7 @@ const orderedSelectedNodes = computed({
     </div>
   </div>
   <div v-else
-    class="text-center text-sm text-gray-500 p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg flex items-center justify-center h-full">
+    class="text-center text-sm text-gray-500 p-4 bg-gray-50 dark:bg-gray-900/50 misub-radius-md flex items-center justify-center h-full">
     没有可用的手动节点
   </div>
 </template>

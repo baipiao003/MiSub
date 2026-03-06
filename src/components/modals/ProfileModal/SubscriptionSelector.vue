@@ -62,7 +62,7 @@ const orderedSelectedSubs = computed({
     <div class="h-[42px]"></div>
     <div class="relative mb-2">
       <input type="text" v-model="searchModel" placeholder="搜索订阅..."
-        class="w-full pl-9 pr-3 py-1.5 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-xs focus:outline-hidden focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500" />
+        class="w-full pl-9 pr-3 py-1.5 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 misub-radius-md shadow-xs focus:outline-hidden focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500" />
       <svg class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg"
         fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -70,7 +70,7 @@ const orderedSelectedSubs = computed({
       </svg>
     </div>
     <div
-      class="overflow-y-auto space-y-2 p-3 bg-gray-50 dark:bg-gray-900/50 rounded-lg border dark:border-gray-700 h-36 lg:h-64">
+      class="overflow-y-auto space-y-2 p-3 bg-gray-50 dark:bg-gray-900/50 misub-radius-md border dark:border-gray-700 h-36 lg:h-64">
       <div v-for="sub in filteredSubscriptions" :key="sub.id">
         <label class="flex items-center space-x-3 cursor-pointer">
           <input type="checkbox" :checked="selectedIds.includes(sub.id)" @change="emit('toggle-selection', sub.id)"
@@ -92,7 +92,7 @@ const orderedSelectedSubs = computed({
         </h5>
       </div>
       <draggable v-model="orderedSelectedSubs" item-key="id" handle=".drag-handle" ghost-class="opacity-40"
-        class="space-y-1 p-2 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg border border-indigo-200 dark:border-indigo-800 h-32 lg:h-48 overflow-y-auto">
+        class="space-y-1 p-2 bg-indigo-50 dark:bg-indigo-900/20 misub-radius-md border border-indigo-200 dark:border-indigo-800 h-32 lg:h-48 overflow-y-auto">
         <template #item="{ element, index }">
           <div
             class="flex items-center gap-2 px-2 py-1.5 bg-white dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-700 shadow-xs">
@@ -118,7 +118,7 @@ const orderedSelectedSubs = computed({
     </div>
   </div>
   <div v-else
-    class="text-center text-sm text-gray-500 p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg flex items-center justify-center h-full">
+    class="text-center text-sm text-gray-500 p-4 bg-gray-50 dark:bg-gray-900/50 misub-radius-md flex items-center justify-center h-full">
     没有可用的机场订阅
   </div>
 </template>

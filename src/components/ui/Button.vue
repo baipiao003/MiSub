@@ -81,7 +81,7 @@ const handleClick = (event) => {
     :disabled="disabled || loading"
     :aria-label="ariaLabel"
     @click="handleClick"
-    class="relative inline-flex items-center justify-center font-medium smooth-all rounded-xl tap-effect disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden group tracking-wide transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary-500/50"
+    class="relative inline-flex items-center justify-center font-medium smooth-all misub-radius-lg tap-effect disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden group tracking-wide transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary-500/50"
     :class="[
       variantClasses,
       sizeClasses
@@ -94,7 +94,7 @@ const handleClick = (event) => {
       <div class="absolute inset-0 bg-gradient-to-r from-cyan-400/20 via-purple-500/20 to-indigo-500/20 mix-blend-overlay"></div>
     </div>
 
-    <div class="absolute inset-0 rounded-xl ring-1 ring-inset ring-white/20 pointer-events-none"></div>
+    <div class="absolute inset-0 misub-radius-lg ring-1 ring-inset ring-white/20 pointer-events-none"></div>
 
     <svg
       v-if="loading"

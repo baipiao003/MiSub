@@ -1,5 +1,5 @@
 <script setup>
-import { defineAsyncComponent, onMounted, watch, computed } from 'vue'; // [UPDATED] added computed
+import { defineAsyncComponent, onMounted, watch, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { useThemeStore } from './stores/theme';
 import { useSessionStore } from './stores/session';
@@ -38,7 +38,6 @@ const { isDirty, saveState } = storeToRefs(dataStore);
 const uiStore = useUIStore();
 const { layoutMode } = storeToRefs(uiStore);
 
-// [NEW] Computed properties for layout logic
 const isLoggedIn = computed(() => sessionState.value === 'loggedIn');
 const isPublicRoute = computed(() => route.meta.isPublic);
 
@@ -67,24 +66,6 @@ const isDefaultPassword = computed(() => {
   return sessionStore.subscriptionConfig?.isDefaultPassword === true;
 });
 
-const goToSettings = () => {
-  // Navigate to settings (if using router)
-  // For now, if no router link, we can just suggest it. 
-  // But we are in App.vue, we have access to router.
-  // Assuming UI flow allows it. 
-  // If layoutMode is 'modern' we have router. 
-  // If not, Dashboard has tabs.
-  // Let's just create a global event or rely on user navigation? 
-  // Better to provide a button.
-  if (layoutMode.value === 'modern') {
-    const { useRouter } = require('vue-router'); // dynamic import or use existing
-    // route is already imported
-    // router is not, need to use useRouter()
-  }
-};
-// Clean way: just show message and link text
-
-
 onMounted(async () => {
   initTheme();
   await checkSession();
@@ -108,7 +89,7 @@ const handleDiscard = async () => {
 
 <template>
   <div :class="theme"
-    class="min-h-screen flex flex-col text-gray-800 dark:text-gray-200 transition-colors duration-300 bg-gray-100 dark:bg-gray-950">
+    class="min-h-screen flex flex-col text-gray-800 dark:text-gray-200 transition-colors duration-300 bg-gray-100 dark:bg-[#030712]">
     <!-- Navigation -->
     <NavBar v-if="showModernNavBar" :is-logged-in="true" @logout="logout" />
     <Header v-else-if="showLegacyHeader" :is-logged-in="isLoggedIn" @logout="logout" />
@@ -117,7 +98,14 @@ const handleDiscard = async () => {
       'flex items-center justify-center': shouldCenterMain,
       'ios-header-padding': showLegacyHeader
     }">
-      <div v-if="sessionState === 'loading'" class="flex justify-center p-8">Loading...</div>
+      <div
+        v-if="sessionState === 'loading'"
+        class="flex justify-center p-8"
+        role="status"
+        aria-live="polite"
+      >
+        正在加载...
+      </div>
 
       <template v-else-if="isLoggedIn">
         <!-- Security Banner -->

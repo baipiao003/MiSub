@@ -103,6 +103,26 @@ export async function onRequest(context) {
                 const { handleCronTrigger } = await import('./modules/notifications.js');
                 return await handleCronTrigger(env);
             } else {
+                const isLocalhost = ['localhost', '127.0.0.1'].includes(url.hostname);
+
+                // 本地 wrangler pages dev 调试兜底：优先返回静态资源，避免函数逻辑影响 SPA 首屏
+                if (isLocalhost) {
+                    let localResponse = await next();
+                    const isLikelySpaPath = !/\.\w+$/.test(url.pathname)
+                        && !url.pathname.startsWith('/api/')
+                        && !url.pathname.startsWith('/sub/')
+                        && url.pathname !== '/cron';
+
+                    if (localResponse.status === 404 && isLikelySpaPath) {
+                        const indexUrl = new URL('/', request.url);
+                        const indexResponse = await env.ASSETS.fetch(new Request(indexUrl, request));
+                        if (indexResponse.status === 200) {
+                            localResponse = indexResponse;
+                        }
+                    }
+
+                    return applyNoStoreToHtmlResponse(localResponse);
+                }
                 // 静态文件处理
                 const isStaticAsset = /^\/(assets|@vite|src)\/./.test(url.pathname) || /\.\w+$/.test(url.pathname);
 
@@ -135,7 +155,6 @@ export async function onRequest(context) {
                     customLoginPath // [新增] 自定义登录路径
                 ].some(route => url.pathname === route || url.pathname.startsWith(route + '/'));
 
-                const isLocalhost = ['localhost', '127.0.0.1'].includes(url.hostname);
                 const isProtectedSpaRoute = isSpaRoute
                     && url.pathname !== '/login'
                     && url.pathname !== customLoginPath

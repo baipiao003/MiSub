@@ -255,7 +255,7 @@ if (nodeCountResult.status === 'fulfilled' && nodeCountResult.value.ok) {
 const text = await nodeCountResult.value.text();
 let decoded = '';
 try {
-decoded = atOB(text.replace(/\s/g, ''));
+decoded = atob(text.replace(/\s/g, ''));
 } catch {
 decoded = text;
 }

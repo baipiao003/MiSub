@@ -4,7 +4,8 @@
  * 支持 dialer-proxy、reality-opts 等特殊参数
  */
 
-import { urlToClashProxy, urlsToClashProxies } from '../../utils/url-to-clash.js';
+import { urlsToClashProxies } from '../../utils/url-to-clash.js';
+import { clashFix } from '../../utils/format-utils.js';
 import yaml from 'js-yaml';
 
 /**
@@ -153,22 +154,26 @@ export function generateBuiltinClashConfig(nodeList, options = {}) {
         console.log(`[BuiltinClash] ${chainedProxies.length} proxies with dialer-proxy`);
     }
 
-    // 生成 YAML
-    try {
-        const yamlStr = yaml.dump(config, {
-            indent: 2,
-            lineWidth: -1,
-            noRefs: true,
-            quotingType: '"',
-            forceQuotes: false
-        });
-        // 最终清理，确保输出没有控制字符
-        return cleanControlChars(yamlStr);
-    } catch (e) {
-        console.error('[BuiltinClash] YAML generation failed:', e);
-        // Fallback: 使用简单的 JSON 转换
-        return `proxies:\n${proxies.map(p => `  - ${JSON.stringify(p)}`).join('\n')}\n`;
-    }
+// 生成 YAML
+try {
+let yamlStr = yaml.dump(config, {
+indent: 2,
+lineWidth: -1,
+noRefs: true,
+quotingType: '"',
+forceQuotes: false
+});
+
+// 应用 WireGuard 修复
+yamlStr = clashFix(yamlStr);
+
+// 最终清理，确保输出没有控制字符
+return cleanControlChars(yamlStr);
+} catch (e) {
+console.error('[BuiltinClash] YAML generation failed:', e);
+// Fallback: 使用简单的 JSON 转换
+return `proxies:\n${proxies.map(p => ` - ${JSON.stringify(p)}`).join('\n')}\n`;
+}
 }
 
 /**
@@ -187,14 +192,18 @@ export function generateProxiesOnly(nodeList) {
     // 清理控制字符
     proxies = deepCleanControlChars(proxies);
 
-    try {
-        const yamlStr = yaml.dump({ proxies }, {
-            indent: 2,
-            lineWidth: -1,
-            noRefs: true
-        });
-        return cleanControlChars(yamlStr);
-    } catch (e) {
-        return `proxies:\n${proxies.map(p => `  - ${JSON.stringify(p)}`).join('\n')}\n`;
-    }
+try {
+let yamlStr = yaml.dump({ proxies }, {
+indent: 2,
+lineWidth: -1,
+noRefs: true
+});
+
+// 应用 WireGuard 修复
+yamlStr = clashFix(yamlStr);
+
+return cleanControlChars(yamlStr);
+} catch (e) {
+return `proxies:\n${proxies.map(p => ` - ${JSON.stringify(p)}`).join('\n')}\n`;
+}
 }

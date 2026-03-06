@@ -70,7 +70,7 @@ const createDefaultNodeTransform = () => ({
     enabled: false,
     nameIgnoreEmoji: true,
     keys: [
-      { key: 'region', order: 'asc', customOrder: ['??', '??', '??', '???', '??', '??', '??', '??', '??', '???'] },
+      { key: 'region', order: 'asc', customOrder: ['香港', '台湾', '日本', '新加坡', '美国', '韩国', '英国', '德国', '法国', '加拿大'] },
       { key: 'protocol', order: 'asc', customOrder: ['vless', 'trojan', 'vmess', 'hysteria2', 'ss', 'ssr'] },
       { key: 'name', order: 'asc' }
     ]
@@ -296,7 +296,7 @@ const updateSelectedIds = (listName, newIds) => {
   <Modal :show="show" @update:show="emit('update:show', $event)" @confirm="handleConfirm" size="6xl">
     <template #title>
       <div class="flex items-center gap-3">
-        <div class="p-2 rounded-xl bg-indigo-500/10">
+        <div class="p-2 misub-radius-lg bg-indigo-500/10">
           <!-- Folder Icon for Profile -->
           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-500" fill="none" viewBox="0 0 24 24"
             stroke="currentColor" stroke-width="2">

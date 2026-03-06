@@ -8,7 +8,7 @@
     </div>
 
     <!-- Content Card -->
-    <div class="relative z-10 glass-panel border border-white/10 rounded-3xl p-12 max-w-lg w-[90%] text-center shadow-2xl backdrop-blur-xl animate-fade-in-up">
+    <div class="relative z-10 glass-panel border border-white/10 misub-radius-lg p-12 max-w-lg w-[90%] text-center shadow-2xl backdrop-blur-xl animate-fade-in-up">
       <div class="font-display font-bold text-9xl bg-gradient-to-b from-white to-white/10 bg-clip-text text-transparent drop-shadow-lg mb-4 animate-float">
         404
       </div>

@@ -28,11 +28,11 @@ defineEmits(['save', 'discard']);
 
       <div class="flex items-center gap-3 w-full sm:w-auto">
         <button v-if="saveState !== 'success'" @click="$emit('discard')"
-          class="flex-1 sm:flex-none px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors hover:bg-black/5 dark:hover:bg-white/5 rounded-lg whitespace-nowrap">
+          class="flex-1 sm:flex-none px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors hover:bg-black/5 dark:hover:bg-white/5 misub-radius-md whitespace-nowrap">
           放弃
         </button>
         <button @click.prevent="$emit('save')" :disabled="saveState !== 'idle'"
-          class="flex-1 sm:flex-none px-6 py-2 text-sm text-white font-bold rounded-xl shadow-lg flex items-center justify-center transition-all duration-300 transform active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed whitespace-nowrap"
+          class="flex-1 sm:flex-none px-6 py-2 text-sm text-white font-bold misub-radius-lg shadow-lg flex items-center justify-center transition-all duration-300 transform active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed whitespace-nowrap"
           :class="{ 
             'bg-primary-600 hover:bg-primary-500 shadow-primary-500/30 hover:shadow-primary-500/50 hover:-translate-y-0.5': saveState === 'idle', 
             'bg-gray-500 shadow-gray-500/30': saveState === 'saving', 

@@ -135,7 +135,7 @@ const expiryInfo = computed(() => {
         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
           <svg class="h-3.5 w-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
         </div>
-        <input type="text" :value="misub.url" readonly class="w-full text-xs text-gray-500 dark:text-gray-400 bg-gray-50/50 dark:bg-black/20 rounded-lg pl-9 pr-3 py-2 border border-transparent focus:border-primary-500/30 focus:bg-white dark:focus:bg-black/40 focus:outline-none transition-all font-mono truncate" />
+        <input type="text" :value="misub.url" readonly class="w-full text-xs text-gray-500 dark:text-gray-400 bg-gray-50/50 dark:bg-black/20 misub-radius-md pl-9 pr-3 py-2 border border-transparent focus:border-primary-500/30 focus:bg-white dark:focus:bg-black/40 focus:outline-none transition-all font-mono truncate" />
       </div>
 
       <!-- Traffic Usage -->

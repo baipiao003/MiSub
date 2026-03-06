@@ -51,7 +51,7 @@ watch(() => toast.id, () => {
         'fixed top-4 right-4 z-50 min-w-80 max-w-md',
         'sm:min-w-80 min-w-[calc(100vw-2rem)] sm:max-w-md max-w-[calc(100vw-2rem)]',
         'backdrop-blur-lg border border-white/20',
-        'rounded-xl shadow-2xl overflow-hidden',
+        'misub-radius-lg shadow-2xl overflow-hidden',
         'ring-1 transition-all duration-300',
         toastConfig.bg,
         toastConfig.ring
