@@ -13,7 +13,7 @@ const { markDirty } = dataStore;
 const {
   profiles, editingProfile, isNewProfile, showProfileModal, showDeleteProfilesModal,
   handleProfileToggle, handleAddProfile, handleEditProfile,
-  handleSaveProfile, handleDeleteProfile, handleDeleteAllProfiles, copyProfileLink, copyClashLink,
+  handleSaveProfile, handleDeleteProfile, handleDeleteAllProfiles,
   profilesCurrentPage, profilesTotalPages, paginatedProfiles, changeProfilesPage
 } = useProfiles(markDirty);
 
@@ -43,9 +43,21 @@ const handlePreviewProfile = (profileId) => {
 
 const ProfileModal = defineAsyncComponent(() => import('../components/modals/ProfileModal.vue'));
 const LogModal = defineAsyncComponent(() => import('../components/modals/LogModal.vue'));
+const CopyLinkModal = defineAsyncComponent(() => import('../components/modals/CopyLinkModal.vue'));
 
 const showLogModal = ref(false);
 const logProfileName = ref('');
+
+const showCopyModal = ref(false);
+const showCopyModalProfile = ref(null);
+
+const handleOpenCopy = (profileId) => {
+  const profile = profiles.value.find(p => p.id === profileId || p.customId === profileId);
+  if (profile) {
+    showCopyModalProfile.value = profile;
+    showCopyModal.value = true;
+  }
+};
 
 const handleViewLogs = (profileId) => {
   const profile = profiles.value.find(p => p.id === profileId || p.customId === profileId);
@@ -86,15 +98,15 @@ const handleQRCode = (profileId) => {
 
     <ProfilePanel :profiles="profiles" :paginated-profiles="paginatedProfiles" :current-page="profilesCurrentPage"
       :total-pages="profilesTotalPages" @add="handleAddProfile" @edit="handleEditProfile" @delete="handleDeleteProfile"
-      @deleteAll="showDeleteProfilesModal = true" @toggle="handleProfileToggle" @copyLink="copyProfileLink"
-      @copy-clash-link="copyClashLink" @preview="handlePreviewProfile" @reorder="handleProfileReorder"
+      @deleteAll="showDeleteProfilesModal = true" @toggle="handleProfileToggle" @openCopy="handleOpenCopy"
+      @preview="handlePreviewProfile" @reorder="handleProfileReorder"
       @change-page="changeProfilesPage" @viewLogs="handleViewLogs" @qrcode="handleQRCode" />
 
     <LogModal :show="showLogModal" @update:show="showLogModal = $event" :filter-profile-name="logProfileName" />
 
     <ProfileModal v-if="showProfileModal" v-model:show="showProfileModal" :profile="editingProfile"
       :is-new="isNewProfile" :all-subscriptions="subscriptions" :all-manual-nodes="manualNodes"
-      @save="handleSaveProfile" />
+      @save="handleSaveProfile" size="6xl" />
 
     <Modal v-model:show="showDeleteProfilesModal" @confirm="handleDeleteAllProfiles">
       <template #title>
@@ -110,5 +122,7 @@ const handleQRCode = (profileId) => {
       @update:show="showNodePreviewModal = $event" />
 
     <QRCodeModal v-model:show="showQRCodeModal" :url="qrCodeUrl" :title="qrCodeTitle" />
+    
+    <CopyLinkModal v-if="showCopyModal && showCopyModalProfile" v-model:show="showCopyModal" :profile="showCopyModalProfile" :token="settings?.profileToken" />
   </div>
 </template>

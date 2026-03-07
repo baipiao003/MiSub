@@ -506,6 +506,80 @@ return null;
 }
 
 /**
+ * 将 TUIC URL 转换为 Clash 代理对象
+ * @param {string} url - TUIC URL
+ * @returns {Object|null} Clash 代理对象
+ */
+function parseTuicUrl(url) {
+    try {
+        // tuic://token@server:port?sni=xxx&alpn=xxx#name
+        const body = url.substring(7); // 去掉 tuic://
+
+        const atIndex = body.indexOf('@');
+        if (atIndex === -1) return null;
+
+        let token = body.substring(0, atIndex);
+        try {
+            token = decodeURIComponent(token);
+        } catch { }
+
+        let serverPart = body.substring(atIndex + 1);
+        const queryIndex = serverPart.indexOf('?');
+        const hashIndex = serverPart.indexOf('#');
+
+        if (queryIndex !== -1) {
+            serverPart = serverPart.substring(0, queryIndex);
+        } else if (hashIndex !== -1) {
+            serverPart = serverPart.substring(0, hashIndex);
+        }
+
+        const { server, port } = parseHostPort(serverPart);
+        const params = parseQueryParams(url);
+        const name = extractName(url);
+
+        const proxy = {
+            name: name || `TUIC-${server}`,
+            type: 'tuic',
+            server,
+            port,
+            token
+        };
+
+        // SNI
+        if (params.get('sni')) {
+            proxy.sni = params.get('sni');
+        }
+
+        // ALPN
+        if (params.get('alpn')) {
+            proxy.alpn = params.get('alpn').split(',');
+        }
+
+        // Skip cert verify
+        if (params.get('allowInsecure') === '1' || params.get('insecure') === '1') {
+            proxy['skip-cert-verify'] = true;
+        }
+        
+        // 拥塞控制
+        if (params.get('congestion_control')) {
+            proxy['congestion-controller'] = params.get('congestion_control');
+        }
+
+        // [重要] dialer-proxy 链式代理
+        if (params.get('dp')) {
+            proxy['dialer-proxy'] = params.get('dp');
+        }
+
+        proxy.udp = true;
+
+        return proxy;
+    } catch (e) {
+        console.error('解析 TUIC URL 失败:', e);
+        return null;
+    }
+}
+
+/**
 * 将 WireGuard URL 转换为 Clash 代理对象
 * @param {string} url - WireGuard URL
 * @returns {Object|null} Clash 代理对象
@@ -625,6 +699,8 @@ return parseVmessUrl(url);
 return parseSsUrl(url);
 } else if (lowerUrl.startsWith('hysteria2://') || lowerUrl.startsWith('hy2://')) {
 return parseHysteria2Url(url);
+} else if (lowerUrl.startsWith('tuic://')) {
+return parseTuicUrl(url);
 } else if (lowerUrl.startsWith('wireguard://')) {
 return parseWireguardUrl(url);
 }

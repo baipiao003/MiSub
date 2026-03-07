@@ -15,7 +15,7 @@ const props = defineProps({
   totalPages: Number,
 });
 
-const emit = defineEmits(['add', 'edit', 'delete', 'deleteAll', 'toggle', 'copyLink', 'copyClashLink', 'preview', 'reorder', 'changePage', 'viewLogs', 'qrcode']);
+const emit = defineEmits(['add', 'edit', 'delete', 'deleteAll', 'toggle', 'openCopy', 'preview', 'reorder', 'changePage', 'viewLogs', 'qrcode']);
 
 // [FIX] Compute profiles to display: use paginated if available, else all profiles
 const displayProfiles = computed(() => {
@@ -35,8 +35,7 @@ const displayProfiles = computed(() => {
 const handleEdit = (profileId) => emit('edit', profileId);
 const handleDelete = (profileId) => emit('delete', profileId);
 const handleToggle = (event) => emit('toggle', event);
-const handleCopyLink = (profileId) => emit('copyLink', profileId);
-const handleCopyClashLink = (profileId) => emit('copyClashLink', profileId);
+const handleOpenCopy = (profileId) => emit('openCopy', profileId);
 const handlePreview = (profileId) => emit('preview', profileId);
 const handleAdd = () => emit('add');
 const handleChangePage = (page) => emit('changePage', page);
@@ -94,8 +93,7 @@ const handleMoveDown = (index) => {
             @move-up="handleMoveUp(index)"
             @move-down="handleMoveDown(index)"
             @view-logs="emit('viewLogs', profile.id)"
-            @copy-link="handleCopyLink(profile.id)"
-            @copy-clash-link="handleCopyClashLink(profile.id)"
+            @open-copy="handleOpenCopy(profile.id)"
           />
         </div>
       </div>

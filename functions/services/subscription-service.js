@@ -217,7 +217,18 @@ return '';
             const processedUserAgent = getProcessedUserAgent(userAgent, sub.url);
             const requestHeaders = { 'User-Agent': processedUserAgent };
 
-            const response = await fetchWithRetry(sub.url, {
+            // [Fetch Proxy] 获取单点订阅专属拉取代理前缀
+            let requestUrl = sub.url;
+            if (sub.fetchProxy && typeof sub.fetchProxy === 'string' && sub.fetchProxy.trim()) {
+                const proxyPrefix = sub.fetchProxy.trim();
+                // 将被代理的 URL 进行编码，拼接到代理前缀之后
+                requestUrl = `${proxyPrefix}${encodeURIComponent(sub.url)}`;
+                if (debug) {
+                    console.debug(`[DEBUG] Fetching via proxy: ${requestUrl}`);
+                }
+            }
+
+            const response = await fetchWithRetry(requestUrl, {
                 headers: requestHeaders,
                 redirect: "follow",
                 cf: {
@@ -228,7 +239,7 @@ return '';
             });
 
             if (!response.ok) {
-                console.warn(`订阅请求失败: ${sub.url}, 状态: ${response.status}`);
+                console.warn(`订阅请求失败: ${requestUrl}, 状态: ${response.status}`);
                 return '';
             }
             const buffer = await response.arrayBuffer();

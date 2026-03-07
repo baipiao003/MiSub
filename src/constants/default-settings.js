@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Default settings constants.
  * @author MiSub Team
  */
@@ -72,7 +72,8 @@ prependGroupName: false
 export const DEFAULT_NODE_FORM = {
     name: '',
     url: '',
-    enabled: true
+    enabled: true,
+    fetchProxy: ''
 };
 
 export const DEFAULT_PROFILE_FORM = {

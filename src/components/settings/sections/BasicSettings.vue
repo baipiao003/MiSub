@@ -148,6 +148,9 @@ watch(() => props.settings.customLoginPath, (val) => {
           <div>
             <p class="text-sm font-medium text-gray-900 dark:text-gray-200">开启访问日志 & 计数</p>
             <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">记录订阅访问并统计流量与IP</p>
+            <p class="text-[11px] text-amber-600 dark:text-amber-400 mt-1">
+              ⚠️ 受 CF KV 最终一致性与缓存机制影响，日志写入和流量统计最高可能有分钟级的延迟，频繁刷新并不能实时反馈。
+            </p>
           </div>
           <Switch 
             v-model="settings.enableAccessLog"

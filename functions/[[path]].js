@@ -24,6 +24,12 @@ import { createJsonResponse } from './modules/utils.js';
 import { corsMiddleware, securityHeadersMiddleware } from './middleware/cors.js';
 import { handleDisguiseRequest } from './modules/handlers/disguise-handler.js';
 
+// 静态导入核心依赖以优化冷加载
+import { StorageFactory, SettingsCache } from './storage-adapter.js';
+import { KV_KEY_SETTINGS } from './modules/config.js';
+import { handleCronTrigger } from './modules/notifications.js';
+import { authMiddleware } from './modules/auth-middleware.js';
+
 function parseCorsOrigins(env, requestUrl) {
     const configured = (env?.CORS_ORIGINS || '')
         .split(',')
@@ -76,8 +82,6 @@ export async function onRequest(context) {
             } else if (url.pathname === '/cron') {
                 // 定时任务路由 (需要认证)
                 // 使用设置中的 cronSecret 进行验证
-                const { StorageFactory } = await import('./storage-adapter.js');
-                const { KV_KEY_SETTINGS } = await import('./modules/config.js');
                 const storageAdapter = StorageFactory.createAdapter(env, await StorageFactory.getStorageType(env));
                 const settings = await storageAdapter.get(KV_KEY_SETTINGS) || {};
 
@@ -100,7 +104,6 @@ export async function onRequest(context) {
                     return createJsonResponse({ error: 'Unauthorized' }, 401);
                 }
 
-                const { handleCronTrigger } = await import('./modules/notifications.js');
                 return await handleCronTrigger(env);
             } else {
                 const isLocalhost = ['localhost', '127.0.0.1'].includes(url.hostname);
@@ -126,15 +129,11 @@ export async function onRequest(context) {
                 // 静态文件处理
                 const isStaticAsset = /^\/(assets|@vite|src)\/./.test(url.pathname) || /\.\w+$/.test(url.pathname);
 
-                // [Smart Disguise & Custom Login Logic]
                 // 需要提前读取 Settings 来获取 customLoginPath
                 // 为了性能，只有在非静态资源且可能是 SPA 路由时才读取
                 let settings = {};
                 if (!isStaticAsset) {
-                    const { StorageFactory } = await import('./storage-adapter.js');
-                    const { KV_KEY_SETTINGS } = await import('./modules/config.js');
-                    const storageAdapter = StorageFactory.createAdapter(env, await StorageFactory.getStorageType(env));
-                    settings = await storageAdapter.get(KV_KEY_SETTINGS) || {};
+                    settings = await SettingsCache.get(env) || {};
                 }
 
                 const customLoginPath = settings.customLoginPath ? '/' + settings.customLoginPath.replace(/^\//, '') : '/login';
@@ -167,7 +166,6 @@ export async function onRequest(context) {
                 // [Fix] Skip auth check on localhost to avoid port 8787/5173 sync issues during dev
                 // [修复] 排除 /offline 路由的认证检查
                 if (isProtectedSpaRoute && !isLocalhost) {
-                    const { authMiddleware } = await import('./modules/auth-middleware.js');
                     const isAuthenticated = await authMiddleware(request, env);
                     if (!isAuthenticated) {
                         // Redirect to login page

@@ -151,11 +151,16 @@ function convertClashProxyToUrl(proxy) {
         if (type === 'hysteria2') {
             const params = [];
             const password = proxy.password || proxy.auth || '';
-            if (password) params.push(`obfs-password=${encodeURIComponent(password)}`);
-            if (proxy.sni) params.push(`sni=${encodeURIComponent(proxy.sni)}`);
-            if (proxy.skipCertVerify) params.push('insecure=1');
 
-            return `hysteria2://${password}@${server}:${port}?${params.join('&')}#${encodeURIComponent(name)}`;
+            // 混淆参数：仅在配置了 obfs 时传递（与认证密码无关）
+            if (proxy.obfs) params.push(`obfs=${encodeURIComponent(proxy.obfs)}`);
+            if (proxy['obfs-password']) params.push(`obfs-password=${encodeURIComponent(proxy['obfs-password'])}`);
+
+            if (proxy.sni) params.push(`sni=${encodeURIComponent(proxy.sni)}`);
+            if (proxy.skipCertVerify || proxy['skip-cert-verify']) params.push('insecure=1');
+
+            const query = params.length > 0 ? `?${params.join('&')}` : '';
+            return `hysteria2://${encodeURIComponent(password)}@${server}:${port}${query}#${encodeURIComponent(name)}`;
         }
 
         if (type === 'socks5') {
@@ -279,8 +284,102 @@ return null;
 }
 
 /**
+ * 尝试解析 Surge 或 Quantumult X 格式的节点字符串
+ * 转换为 Clash proxy 对象
+ */
+function parseSurgeOrQxLine(line) {
+    if (!line || line.startsWith('#') || line.startsWith(';')) return null;
+
+    // Surge 格式: "name = protocol, server, port, key=value, ..."
+    let match = line.match(/^([^=]+)=(shadowsocks|ss|ssr|vmess|vless|trojan|hysteria2?|hy2|hysteria|tuic|snell|anytls|socks5|http|https),\s*([^,]+),\s*(\d+)(.*)$/i);
+    if (match) {
+        const proxy = {
+            name: match[1].trim(),
+            type: match[2].toLowerCase(),
+            server: match[3].trim(),
+            port: Number(match[4]),
+        };
+        const extraParams = match[5];
+        if (extraParams) {
+            const parts = extraParams.split(',').map(p => p.trim());
+            for (const p of parts) {
+                if (!p) continue;
+                const kv = p.split('=');
+                if (kv.length >= 2) {
+                    const k = kv[0].trim().toLowerCase();
+                    let v = kv.slice(1).join('=').trim();
+                    if (v.startsWith('"') && v.endsWith('"')) v = v.slice(1, -1);
+                    
+                    if (k === 'password' || k === 'auth' || k === 'psk') {
+                        if (proxy.type === 'vless' || proxy.type === 'vmess') proxy.uuid = v;
+                        else proxy.password = v;
+                    }
+                    if (k === 'sni') proxy.sni = v;
+                    if (k === 'skip-cert-verify' && v === 'true') proxy.skipCertVerify = true;
+                    if (k === 'encrypt-method' || k === 'cipher' || k === 'method') proxy.cipher = v;
+                    if (k === 'obfs') { proxy.pluginOpts = proxy.pluginOpts || {}; proxy.pluginOpts.mode = v; }
+                    if (k === 'obfs-host') { proxy.pluginOpts = proxy.pluginOpts || {}; proxy.pluginOpts.host = v; }
+                    if (k === 'tfo' && v === 'true') proxy.tfo = true;
+                    if (k === 'udp-relay' && v === 'true') proxy.udp = true;
+                }
+            }
+        }
+        return proxy;
+    }
+
+    // QX 格式: "protocol=server:port, key=value, ..., tag=name"
+    match = line.match(/^(shadowsocks|ss|ssr|vmess|vless|trojan|hysteria2?|hy2|hysteria|tuic|snell|anytls|socks5|http|https)=([^,:]+):(\d+)(.*)$/i);
+    if (match) {
+        const proxy = {
+            name: 'Untitled',
+            type: match[1].toLowerCase(),
+            server: match[2].trim(),
+            port: Number(match[3]),
+        };
+        const extraParams = match[4];
+        if (extraParams) {
+            const parts = extraParams.split(',').map(p => p.trim());
+            for (const p of parts) {
+                if (!p) continue;
+                const kv = p.split('=');
+                if (kv.length >= 2) {
+                    const k = kv[0].trim().toLowerCase();
+                    let v = kv.slice(1).join('=').trim();
+                    if (v.startsWith('"') && v.endsWith('"')) v = v.slice(1, -1);
+                    
+                    if (k === 'tag') proxy.name = v;
+                    if (k === 'password' || k === 'auth' || k === 'psk') {
+                        if (proxy.type === 'vless' || proxy.type === 'vmess') proxy.uuid = v;
+                        else proxy.password = v;
+                    }
+                    if (k === 'sni' || k === 'tls-host' || k === 'obfs-host') proxy.sni = v;
+                    if (k === 'tls-verification' && v === 'false') proxy.skipCertVerify = true;
+                    if (k === 'method' || k === 'cipher') proxy.cipher = v === 'none' ? undefined : v;
+                    if (k === 'obfs') {
+                        if (v === 'over-tls') proxy.tls = true;
+                        else { proxy.pluginOpts = proxy.pluginOpts || {}; proxy.pluginOpts.mode = v; }
+                    }
+                    if (k === 'vless-flow') proxy.flow = v;
+                    if (k === 'reality-base64-pubkey' || k === 'reality-pubkey') {
+                        proxy['reality-opts'] = proxy['reality-opts'] || {};
+                        proxy['reality-opts']['public-key'] = v;
+                    }
+                    if (k === 'reality-hex-shortid' || k === 'reality-shortid') {
+                        proxy['reality-opts'] = proxy['reality-opts'] || {};
+                        proxy['reality-opts']['short-id'] = v;
+                    }
+                }
+            }
+        }
+        return proxy;
+    }
+    
+    return null;
+}
+
+/**
  * 从文本中提取所有有效的节点URL
- * 支持：Clash YAML, Base64, 纯文本列表
+ * 支持：Clash YAML, Base64, 纯文本列表, Surge/QX 参数文本
  */
 export function extractValidNodes(text) {
     if (!text || typeof text !== 'string') return [];
@@ -341,6 +440,16 @@ export function extractValidNodes(text) {
     for (const line of lines) {
         if (NODE_PROTOCOL_REGEX.test(line)) {
             nodes.push(line);
+            continue;
+        }
+
+        // 尝试解析 Surge 或 QX 的 raw line格式
+        const proxyObj = parseSurgeOrQxLine(line);
+        if (proxyObj) {
+            const convertedUrl = convertClashProxyToUrl(proxyObj);
+            if (convertedUrl) {
+                nodes.push(convertedUrl);
+            }
         }
     }
 
