@@ -25,6 +25,7 @@ const navItems = MAIN_NAV_ITEMS;
       
       <NavActionGroup
         :is-logged-in="true"
+        :with-focus-ring="true"
         rounded-class="rounded-full"
         @toggle-layout="uiStore.toggleLayout()"
         @logout="emit('logout')"

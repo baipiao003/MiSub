@@ -12,7 +12,6 @@ import LoginEntryButton from './LoginEntryButton.vue';
 import ExternalRepoButton from './ExternalRepoButton.vue';
 import AdaptiveGrid from './AdaptiveGrid.vue';
 import DashboardSkeleton from './DashboardSkeleton.vue';
-import MobileBottomNav from './MobileBottomNav.vue';
 
 export {
   Header,
@@ -23,8 +22,7 @@ export {
   LoginEntryButton,
   ExternalRepoButton,
   AdaptiveGrid,
-  DashboardSkeleton,
-  MobileBottomNav
+  DashboardSkeleton
 };
 
 export const LayoutComponents = {
@@ -36,8 +34,7 @@ export const LayoutComponents = {
   LoginEntryButton,
   ExternalRepoButton,
   AdaptiveGrid,
-  DashboardSkeleton,
-  MobileBottomNav
+  DashboardSkeleton
 };
 
 export default LayoutComponents;

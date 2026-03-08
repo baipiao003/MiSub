@@ -55,14 +55,16 @@ const handleConfirm = () => {
         </p>
         
         <div class="relative">
-          <label class="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1.5 ml-1 block">
-            分组名称
-          </label>
-          <GroupSelector
-            v-model="groupName"
-            :groups="groups"
-            placeholder="选择或输入新分组..."
-          />
+          <div class="flex flex-col">
+            <label class="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1.5 ml-1">
+              分组名称
+            </label>
+            <GroupSelector
+              v-model="groupName"
+              :groups="groups"
+              placeholder="选择或输入新分组..."
+            />
+          </div>
         </div>
       </div>
     </template>

@@ -19,9 +19,11 @@ const urlFocused = ref(false);
 
 const handleConfirm = () => {
     emit('import', importText.value, selectedGroup.value); // group passed as second arg
-    emit('update:show', false);
     importText.value = '';
     selectedGroup.value = '';
+    setTimeout(() => {
+        emit('update:show', false);
+    }, 1000);
 };
 </script>
 

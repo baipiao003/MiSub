@@ -5,6 +5,7 @@ import Card from '../ui/Card.vue';
 import MoreActionsMenu from '@/components/shared/MoreActionsMenu.vue';
 import PanelHeader from '@/components/shared/PanelHeader.vue';
 import PanelPagination from '@/components/shared/PanelPagination.vue';
+import EmptyState from '@/components/ui/EmptyState.vue';
 
 const props = defineProps({
   subscriptions: { type: Array, default: () => [] },
@@ -105,7 +106,14 @@ const handleImport = () => emit('import');
         @change-page="handleChangePage"
       />
     </div>
-    <div v-else class="text-center py-12 text-gray-500 border-2 border-dashed border-gray-300 dark:border-gray-700 misub-radius-lg"><svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1"><path stroke-linecap="round" stroke-linejoin="round" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" /></svg><h3 class="mt-4 text-lg font-medium text-gray-900 dark:text-white">没有机场订阅</h3><p class="mt-1 text-sm text-gray-500">从添加你的第一个订阅开始。</p></div>
+    <div v-else class="py-4 border-2 border-dashed border-gray-300 dark:border-gray-700 misub-radius-lg">
+      <EmptyState 
+        title="没有机场订阅" 
+        description="从添加你的第一个订阅开始。" 
+        icon="folder" 
+        :total-count="0" 
+      />
+    </div>
   </div>
 </template>
 

@@ -30,7 +30,6 @@ const { sessionState } = storeToRefs(sessionStore);
 const { checkSession, login, logout } = sessionStore;
 
 const toastStore = useToastStore();
-const { toast: toastState } = storeToRefs(toastStore);
 
 const dataStore = useDataStore();
 const { isDirty, saveState } = storeToRefs(dataStore);
@@ -151,7 +150,7 @@ const handleDiscard = async () => {
 
     </main>
 
-    <Toast :show="toastState.id" :message="toastState.message" :type="toastState.type" />
+    <Toast />
     <PWAUpdatePrompt />
     <PWADevTools />
     <Footer />

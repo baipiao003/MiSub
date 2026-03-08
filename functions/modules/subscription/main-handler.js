@@ -408,7 +408,8 @@ export async function handleMisubRequest(context) {
         try {
             const clashConfig = generateBuiltinClashConfig(combinedNodeList, {
                 fileName: subName,
-                enableUdp: Boolean(config.subConverterUdp)
+                enableUdp: shouldEnableUdp,
+                skipCertVerify: shouldSkipCertificateVerify
             });
 
             const responseHeaders = new Headers({
@@ -470,7 +471,9 @@ export async function handleMisubRequest(context) {
 
             const surgeConfig = generateBuiltinSurgeConfig(combinedNodeList, {
                 fileName: subName,
-                managedConfigUrl: managedUrl
+                managedConfigUrl: managedUrl,
+                skipCertVerify: shouldSkipCertificateVerify,
+                enableUdp: shouldEnableUdp
             });
 
             const responseHeaders = new Headers({

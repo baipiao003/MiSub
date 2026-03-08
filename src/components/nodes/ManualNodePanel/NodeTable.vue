@@ -4,6 +4,7 @@ import draggable from 'vuedraggable';
 import ManualNodeCard from '../ManualNodeCard.vue';
 import ManualNodeList from '../ManualNodeList.vue';
 import PanelPagination from '@/components/shared/PanelPagination.vue';
+import EmptyState from '@/components/ui/EmptyState.vue';
 
 const props = defineProps({
   manualNodes: { type: Array, default: () => [] },
@@ -159,10 +160,13 @@ const handleChangePage = (page) => {
       @update:items-per-page="emit('update:itemsPerPage', $event)"
     />
   </div>
-  <div v-else class="text-center py-12 text-gray-500 border-2 border-dashed border-gray-300 dark:border-gray-700 misub-radius-lg">
-    <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1"><path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l-4 4-4-4M6 16l-4-4 4-4" /></svg>
-    <h3 class="mt-4 text-lg font-medium text-gray-900 dark:text-white">没有手动节点</h3>
-    <p class="mt-1 text-sm text-gray-500">添加分享链接或单个节点。</p>
+  <div v-else class="py-4 border-2 border-dashed border-gray-300 dark:border-gray-700 misub-radius-lg">
+    <EmptyState 
+      title="没有手动节点" 
+      description="添加分享链接或单个节点。" 
+      icon="node" 
+      :total-count="0" 
+    />
   </div>
 </template>
 

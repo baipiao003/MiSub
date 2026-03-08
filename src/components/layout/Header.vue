@@ -48,6 +48,7 @@ const emit = defineEmits(['logout']);
             :is-logged-in="isLoggedIn"
             :show-settings="true"
             :show-login-button="!shouldHideLoginButton"
+            :with-focus-ring="true"
             rounded-class="misub-radius-md"
             @open-settings="uiStore.show()"
             @toggle-layout="uiStore.toggleLayout()"

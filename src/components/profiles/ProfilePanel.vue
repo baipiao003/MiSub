@@ -4,6 +4,7 @@ import ProfileCard from './ProfileCard.vue';
 import MoreActionsMenu from '@/components/shared/MoreActionsMenu.vue';
 import PanelHeader from '@/components/shared/PanelHeader.vue';
 import PanelPagination from '@/components/shared/PanelPagination.vue';
+import EmptyState from '@/components/ui/EmptyState.vue';
 
 const props = defineProps({
   profiles: Array,
@@ -104,10 +105,13 @@ const handleMoveDown = (index) => {
         @change-page="handleChangePage"
       />
     </div>
-    <div v-else class="text-center py-12 text-gray-500 border-2 border-dashed border-gray-300 dark:border-gray-700 misub-radius-lg">
-      <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
-      <h3 class="mt-4 text-lg font-medium text-gray-900 dark:text-white">没有订阅组</h3>
-      <p class="mt-1 text-sm text-gray-500">创建一个订阅组来组合你的节点吧！</p>
+    <div v-else class="py-4 border-2 border-dashed border-gray-300 dark:border-gray-700 misub-radius-lg">
+      <EmptyState 
+        title="没有订阅组" 
+        description="创建一个订阅组来组合你的节点吧！" 
+        icon="folder" 
+        :total-count="0" 
+      />
     </div>
   </div>
 </template>

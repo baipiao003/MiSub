@@ -72,7 +72,7 @@ const submitLogin = async () => {
             v-model="password"
             @input="error = ''"
             type="password"
-            placeholder="Access Token"
+            placeholder="管理员密码 / 访问凭证"
             :disabled="isLoading"
             class="w-full bg-transparent border misub-radius-lg py-3.5 pl-11 pr-4 outline-none transition-all duration-300 disabled:opacity-50"
             :class="[

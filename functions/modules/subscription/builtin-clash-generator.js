@@ -75,7 +75,8 @@ function deduplicateNames(proxies) {
 export function generateBuiltinClashConfig(nodeList, options = {}) {
     const {
         fileName = 'MiSub',
-        enableUdp = true
+        enableUdp = true,
+        skipCertVerify = false
     } = options;
 
     // 解析节点 URL 列表
@@ -94,6 +95,13 @@ export function generateBuiltinClashConfig(nodeList, options = {}) {
     if (enableUdp) {
         proxies.forEach(proxy => {
             proxy.udp = true;
+        });
+    }
+
+    // 强制跳过证书验证
+    if (skipCertVerify) {
+        proxies.forEach(proxy => {
+            proxy['skip-cert-verify'] = true;
         });
     }
 
