@@ -36,7 +36,7 @@ const handleClose = (id) => {
 </script>
 
 <template>
-  <div class="fixed z-50 flex flex-col items-end gap-3 pointer-events-none top-4 right-4 sm:top-4 sm:right-4 left-4 sm:left-auto max-h-[100vh] overflow-hidden pr-1 pb-1">
+  <div class="fixed z-[100] flex flex-col items-end gap-3 pointer-events-none top-20 md:top-4 right-4 left-4 md:left-auto max-h-[calc(100vh-120px)] md:max-h-[100vh] overflow-hidden pr-1 pb-safe">
     <TransitionGroup name="toast">
       <div
         v-for="toast in toastStore.toasts"
@@ -88,6 +88,17 @@ const handleClose = (id) => {
 </template>
 
 <style scoped>
+/* Toast 容器安全区域 */
+.pb-safe {
+  padding-bottom: max(env(safe-area-inset-bottom, 20px), 80px);
+}
+
+@media (min-width: 768px) {
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom, 20px);
+  }
+}
+
 /* Toast 列表动画 */
 .toast-move,
 .toast-enter-active,

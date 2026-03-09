@@ -19,6 +19,7 @@ const PWADevTools = defineAsyncComponent(() => import('./components/features/PWA
 const Dashboard = defineAsyncComponent(() => import('./components/features/Dashboard/Dashboard.vue'));
 const Header = defineAsyncComponent(() => import('./components/layout/Header.vue'));
 const SavePrompt = defineAsyncComponent(() => import('./components/ui/SavePrompt.vue'));
+const ScrollToTop = defineAsyncComponent(() => import('./components/ui/ScrollToTop.vue'));
 
 const route = useRoute();
 const themeStore = useThemeStore();
@@ -93,35 +94,41 @@ const handleDiscard = async () => {
     <NavBar v-if="showModernNavBar" :is-logged-in="true" @logout="logout" />
     <Header v-else-if="showLegacyHeader" :is-logged-in="isLoggedIn" @logout="logout" />
 
-    <main class="grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6" :class="{
-      'flex items-center justify-center': shouldCenterMain,
-      'ios-header-padding': showLegacyHeader
-    }">
-      <div
-        v-if="sessionState === 'loading'"
-        class="flex justify-center p-8"
-        role="status"
-        aria-live="polite"
-      >
-        正在加载...
-      </div>
+<main class="grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-24 md:pb-6" :class="{
+'flex items-center justify-center': shouldCenterMain,
+'ios-header-padding': showLegacyHeader
+}">
+<div
+v-if="sessionState === 'loading'"
+class="flex flex-col items-center justify-center p-8 min-h-[60vh]"
+role="status"
+aria-live="polite"
+>
+<div class="relative mb-8">
+<div class="w-16 h-16 border-4 border-primary-200 dark:border-primary-800 rounded-full animate-pulse"></div>
+<div class="absolute inset-0 w-16 h-16 border-4 border-transparent border-t-primary-500 rounded-full animate-spin"></div>
+</div>
+<div class="flex flex-col items-center gap-3">
+<div class="h-6 w-32 bg-gradient-to-r from-gray-200 to-gray-100 dark:from-gray-700 dark:to-gray-800 rounded animate-pulse"></div>
+<div class="h-4 w-24 bg-gradient-to-r from-gray-100 to-gray-50 dark:from-gray-800 dark:to-gray-900 rounded animate-pulse"></div>
+</div>
+</div>
 
       <template v-else-if="isLoggedIn">
-        <!-- Security Banner -->
-        <div v-if="isDefaultPassword" class="bg-red-600 px-4 py-3 text-white">
-          <div class="mx-auto flex max-w-7xl items-center justify-between">
-            <div class="flex items-center gap-3">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
-                <path fill-rule="evenodd"
-                  d="M9.401 3.003c1.155-2 4.043-2 5.197 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003ZM12 8.25a.75.75 0 0 1 .75.75v3.75a.75.75 0 0 1-1.5 0V9a.75.75 0 0 1 .75-.75Zm0 8.25a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z"
-                  clip-rule="evenodd" />
-              </svg>
-              <p class="text-sm font-medium">
-                安全警告：检测到您正在使用默认密码 "admin"。为了您的系统安全，请立即前往设置修改密码。
-              </p>
-            </div>
-          </div>
-        </div>
+<!-- Security Banner -->
+<div v-if="isDefaultPassword" class="mb-4 px-4 py-4 bg-gradient-to-r from-red-500/90 via-red-600/90 to-red-500/90 backdrop-blur-xl text-white misub-radius-lg border border-red-400/30 shadow-lg shadow-red-500/20">
+<div class="mx-auto flex max-w-7xl items-center justify-center gap-4">
+<div class="relative">
+<div class="absolute inset-0 bg-white/30 rounded-full blur-md animate-pulse"></div>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6 relative z-10">
+<path fill-rule="evenodd" d="M9.401 3.003c1.155-2 4.043-2 5.197 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003ZM12 8.25a.75.75 0 0 1 .75.75v3.75a.75.75 0 0 1-1.5 0V9a.75.75 0 0 1 .75-.75Zm0 8.25a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z" clip-rule="evenodd" />
+</svg>
+</div>
+<p class="text-sm font-medium">
+安全警告：检测到您正在使用默认密码 "admin"。为了您的系统安全，请立即前往设置修改密码。
+</p>
+</div>
+</div>
 
         <SavePrompt :is-dirty="showSavePrompt" :save-state="saveState" @save="handleSave" @discard="handleDiscard" />
 
@@ -150,11 +157,12 @@ const handleDiscard = async () => {
 
     </main>
 
-    <Toast />
-    <PWAUpdatePrompt />
-    <PWADevTools />
-    <Footer />
-  </div>
+<Toast />
+<PWAUpdatePrompt />
+<PWADevTools />
+<Footer />
+<ScrollToTop v-if="isLoggedIn || isPublicRoute" />
+</div>
 </template>
 
 <style>

@@ -67,20 +67,25 @@
     /* Default minimal border */
   }
 
-  html {
-    font-family: var(--font-body);
-    scroll-behavior: smooth;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
+html {
+font-family: var(--font-body);
+scroll-behavior: smooth;
+-webkit-font-smoothing: antialiased;
+-moz-osx-font-smoothing: grayscale;
+color-scheme: light;
+}
 
-  body {
-    background-color: var(--bg-page-light);
-    color: #1e293b;
-    /* 🌞 Light Mode: Subtle Warmth & Texture */
-  background: #f8fafc;
-    background-attachment: fixed;
-  }
+.dark html {
+color-scheme: dark;
+}
+
+body {
+background-color: var(--bg-page-light);
+color: #1e293b;
+background: #f8fafc;
+background-attachment: fixed;
+transition: background-color 0.5s ease, color 0.3s ease;
+}
 
   h1,
   h2,
@@ -508,4 +513,27 @@ transform: none !important;
 transform: none !important;
 box-shadow: none !important;
 }
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+animation-duration: 0.3s;
+}
+
+::view-transition-old(root) {
+animation-name: fade-out;
+}
+
+::view-transition-new(root) {
+animation-name: fade-in;
+}
+
+@keyframes fade-out {
+from { opacity: 1; }
+to { opacity: 0; }
+}
+
+@keyframes fade-in {
+from { opacity: 0; }
+to { opacity: 1; }
 }
